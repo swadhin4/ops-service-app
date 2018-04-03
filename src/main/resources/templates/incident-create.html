@@ -1,0 +1,127 @@
+ <body>
+ 
+                             <table style="text-align: left;width:80%; 	 border-collapse: collapse; border: 0px solid #b18b8b;
+								    padding: 8px 10px 10px 10px;
+								    background-color: #031c2929;
+								    border-radius: 10px 10px 10px 10px;">
+                              <tr>
+                                <th style=" border: 0px solid #ddd; padding: 8px;">
+                                  <h1>Issue Reported By ${company}</h1>
+								  <p>Dear Chris Gruen,</p>
+                                  <p>The following issue has been reported which requires your attention.</p>
+								  <p>For Service Provider ${serviceProvider} </p>
+								  <h3>Ticket Primary Details</h3>
+                                     <table style="text-align: left;background-color: #fff;width:100%" >
+                                       <tbody>
+                                         <tr>
+								  <th >Site Name</th> <td style="text-align: center">${siteName}</td>
+								  <th>Site Owner</th> <td style="text-align: center">${siteOwner}</td>
+								 </tr>
+								 <tr>
+								  <th>Site ID number 1</th> <td style="text-align: center">${siteIdNumber1}</td>
+								  <th>Site ID number 2</th> <td style="text-align: center">${siteIdNumber2}</td>
+								  </tr> 
+                                      </tbody>
+                                    </table>
+                                    
+                                   <h3>Contact details on Site</h3>
+                                     <table style="text-align: left;background-color: #fff;width:100%" >
+                                       <tbody>
+                                         <tr>
+								  <th>Contact Name</th> <td style="text-align: center">${siteContactName}</td>
+								  </tr>
+								    <tr>
+								  <th>Contact Email </th> <td style="text-align: center">${siteContactEmail}</td>
+								  </tr>
+								  <tr>
+								   <th>Primary Phone number </th> <td style="text-align: center">${siteContactPhone}</td>
+								 </tr>
+								 
+                                      </tbody>
+                                    </table>
+                                      
+								  <h3>Contact details who requested ticket to be created</h3>
+								      <table style="text-align: left;background-color: #fff; width:100%">
+                                       <tbody>
+                                         <tr>
+								  <th>Name</th> <td style="text-align: center">${contactName}</td>
+								 </tr>
+								 <tr>
+								  <th>Email</th> <td style="text-align: center">${contactEmail}</td>
+								  </tr> 
+                                      </tbody>
+                                    </table>
+						
+								  <h3>Ticket Details</h3>
+								  <table style="text-align: left;background-color: #fff; width:100%">
+                                    <tr>
+                                      <th> Ticket Number </th> <td style="padding: 8px;">${ticketNumber} </td>
+                                      </tr>
+                                       <tr>
+                                       <th> Ticket name </th>  <td style="padding: 8px;">${ticketName} </td>
+                                       </tr>
+                                     
+                                       <tr>
+                                      <th> Ticket Category </th>  <td style="padding: 8px;">${ticketCategory} </td>
+                                      </tr>
+                                    <tr>
+                                       <th> Asset or Service impacted </th>  <td style="padding: 8px;">${assetImpacted} </td>
+                                       </tr>
+                                       <tr>
+                                         <th> Priority </th>  <td style="padding: 8px;">${ticketPriority} </td>
+                                         </tr>
+                                         <tr>
+                                      <th> Issue Started on </th>  <td style="padding: 8px;">${issueStartDate} </td>
+                                      </tr>
+                                       <tr>
+                                      <th> Ticket requires resolution by Date </th>  <td style="padding: 8px;">${resolutionDate} </td>
+                                      </tr>
+                                      <tr>
+                                      <th> Current Status </th>  <td style="padding: 8px;">${currentStatus} </td>
+                                      </tr>	
+                                      <tr>
+                                       <th> Ticket description</th> </tr> 
+                                       <tr>
+                                       <td style="padding: 8px;">${ticketDescription} </td>
+                                       </tr>
+                                  </table>
+                                  <h3>To access the database</h3>
+                                  <table style="text-align: left;background-color: #fff; width:100%">
+                                    <tr>
+                                      <th>1) Access the link : http://34.209.65.191:8080/login </th>
+                                    </tr>
+                                    <tr>
+                                      <td>2) Use username: ${username} </td>
+                                    </tr>
+                                    <tr>
+                                      <td>3) Insert your access key: ${secretKey}</td>
+                                    </tr>
+                                  </table>
+                                  <hr>
+								  </br>
+                                  <h3>To review and update your ticket in the application:</h3>
+                                  <p>a) Select the ticket and click on action: update ticket on the top right corner to view further ticket details including pictures if available.</p>
+								  <p>b) Insert your own ticket reference number on the primary details screen: External ticket number.</p>
+								  <p>c) Update the ticket status field to notify the customer if you have logged the ticket on your side, or working the ticket or have closed the ticket.</p>
+								  </br>
+								  <p>Please contact the ticket requestor or the contact on site to clarify any ticket related details. </p>
+                                </th>
+                              </tr>
+                            </table>
+                         
+                    <table >
+                      <tbody>
+                        <tr>
+                          <th>
+                           <!-- <img src="http://34.209.65.191:8080/resources/img/logo.png" alt="" style="width: 105px;"> -->
+                          </th>
+                          <th>
+                          <p> For further questions and comments on how to handle this application please contact:<br>  info@sigmasurge.com, www.sigmasurge.com</p>
+                          </th>
+                        </tr>
+                      </tbody>
+                    </table>
+                  
+  </body>
+
+</html>
