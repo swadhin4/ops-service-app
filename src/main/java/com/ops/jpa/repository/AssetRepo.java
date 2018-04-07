@@ -25,5 +25,6 @@ public interface AssetRepo extends JpaRepository<Asset, Long>{
 	public List<Asset> findBySiteIdIn(@Param("siteId") List<Long> siteId);
 	
 	public List<Asset> findByAssetCodeAndSiteIdInAndDelFlag(String accetCode, List<Long> siteId, int delFlag);
+	
 
 }

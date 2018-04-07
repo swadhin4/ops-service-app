@@ -10,6 +10,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -19,9 +21,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import com.ops.app.constants.QueryConstants;
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.AssetVO;
 import com.ops.app.vo.LoginUser;
+import com.ops.app.vo.SiteInfoVO;
 import com.ops.app.vo.UploadFile;
 import com.ops.jpa.entities.Asset;
 import com.ops.jpa.entities.AssetCategory;
@@ -65,15 +69,36 @@ public class AssetServiceImpl implements AssetService{
 	
 	@Autowired
 	private FileIntegrationService fileIntegrationService;
+	
+	@Autowired
+	private EntityManager entityManager;
 
 	@Override
 	@Transactional
 	public List<AssetVO> findAllAsset(LoginUser user) throws Exception {
 		LOGGER.info("Inside AssetServiceImpl .. findAllAsset");
 		LOGGER.info("Getting Asset List for logged in user : "+  user.getFirstName() + "" + user.getLastName());
-		List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(user.getUserId());
+		//List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(user.getUserId());
+		String ejbQl1 = QueryConstants.SITE_ACCESS_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl1);
+		q.setParameter("userId", user.getUserId());
+		List<Object[]> siteList =  q.getResultList();
+		List<Long> siteIds = new ArrayList<Long>();
 		List<AssetVO> siteAssetVOList = new ArrayList<AssetVO>();
-		if(userSiteAccessList.isEmpty()){
+		if(!siteList.isEmpty()){
+			for (Object[] result : siteList) {
+				siteIds.add(Long.parseLong(result[0].toString()));		
+			}
+		String ejbQl2 = QueryConstants.USER_SITE_ASSET_QUERY;
+		Query q2= entityManager.createNativeQuery(ejbQl2);
+		q.setParameter("siteIds", siteIds);
+		List<Object[]> assetList =  q2.getResultList();
+		LOGGER.info("Total Assets for user : "+  assetList.size());
+		
+		siteAssetVOList = populateAssetList1(siteAssetVOList, assetList);
+		}
+		
+		/*if(userSiteAccessList.isEmpty()){
 			LOGGER.info("User donot have any access to sites");
 		}else{
 			LOGGER.info("User is having access to "+userSiteAccessList.size()+" sites");
@@ -91,10 +116,25 @@ public class AssetServiceImpl implements AssetService{
 			if(!siteAssetList.isEmpty()){
 				siteAssetVOList = populateAssetList(siteAssetVOList, siteAssetList);
 			}
-		}
+		}*/
 
 		LOGGER.info("Exit AssetServiceImpl .. findAllAsset");
 		return siteAssetVOList == null?Collections.EMPTY_LIST:siteAssetVOList;
+	}
+
+	private List<AssetVO> populateAssetList1(List<AssetVO> siteAssetVOList, List<Object[]> assetList) {
+		
+		for (Object[] result : assetList) {
+			AssetVO assetVO = new AssetVO();
+			assetVO.setAssetId(Long.parseLong(result[0].toString()));
+			assetVO.setAssetName(result[1]==null?"":result[1].toString());
+			assetVO.setSiteName(result[2]==null?"":result[2].toString());
+			assetVO.setCategoryId(result[3]==null?0l:Long.parseLong(result[3].toString()));
+			assetVO.setAssetCategoryName(result[4]==null?"":result[4].toString());
+			assetVO.setAssetType(result[5]==null?"":result[5].toString());
+			siteAssetVOList.add(assetVO);
+		}
+		return siteAssetVOList;
 	}
 
 	private List<AssetVO> populateAssetList(List<AssetVO> siteAssetVOList, List<Asset> siteAssetList) {

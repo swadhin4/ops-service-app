@@ -15,6 +15,12 @@ public class QueryConstants {
 			+ " from pm_site s inner join pm_user_access uc on s.site_id = uc.site_id and uc.user_id=:userId "
 			+ " order by s.created_date desc";
 	
+	public final static String SITE_ACCESS_QUERY="select s.site_id, s.site_name "
+			+ " from pm_site s inner join pm_user_access uc on s.site_id = uc.site_id and uc.user_id=:userId "
+			+ " order by s.created_date desc";
 	
+	public final static String USER_SITE_ASSET_QUERY="select a.asset_id, a.asset_name,s.site_name,c.category_id,"
+			+ " c.category_name, c.asset_type from pm_asset a, pm_site s, pm_asset_category c"
+			+ " where a.site_id=s.site_id and s.site_id in (:siteIds) and c.category_id=a.category_id and a.del_flag=0 ";
 	
 }
