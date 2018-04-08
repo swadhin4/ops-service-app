@@ -1,4 +1,5 @@
 package com.ops.app.constants;
+// Query related to mobile apps
 public class QueryConstants {
 
 	public final static String INCIDENT_LIST_QUERY="select ct.id, ct.ticket_number as ticketNumber,"
