@@ -1,6 +1,7 @@
 package com.ops.web.service.impl;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,7 +26,6 @@ import com.ops.app.constants.QueryConstants;
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.AssetVO;
 import com.ops.app.vo.LoginUser;
-import com.ops.app.vo.SiteInfoVO;
 import com.ops.app.vo.UploadFile;
 import com.ops.jpa.entities.Asset;
 import com.ops.jpa.entities.AssetCategory;
@@ -33,7 +33,6 @@ import com.ops.jpa.entities.AssetLocation;
 import com.ops.jpa.entities.Company;
 import com.ops.jpa.entities.ServiceProvider;
 import com.ops.jpa.entities.Site;
-import com.ops.jpa.entities.UserSiteAccess;
 import com.ops.jpa.repository.AssetCategoryRepo;
 import com.ops.jpa.repository.AssetLocationRepo;
 import com.ops.jpa.repository.AssetRepo;
@@ -83,15 +82,16 @@ public class AssetServiceImpl implements AssetService{
 		Query q= entityManager.createNativeQuery(ejbQl1);
 		q.setParameter("userId", user.getUserId());
 		List<Object[]> siteList =  q.getResultList();
-		List<Long> siteIds = new ArrayList<Long>();
+		List<String> siteIds=new ArrayList<String>();
 		List<AssetVO> siteAssetVOList = new ArrayList<AssetVO>();
 		if(!siteList.isEmpty()){
 			for (Object[] result : siteList) {
-				siteIds.add(Long.parseLong(result[0].toString()));		
+				siteIds.add(result[0].toString());
 			}
-		String ejbQl2 = QueryConstants.USER_SITE_ASSET_QUERY;
+			String sites=String.join(",", siteIds);
+		String ejbQl2 = QueryConstants.USER_SITE_ASSET_QUERY + sites + " )";
 		Query q2= entityManager.createNativeQuery(ejbQl2);
-		q.setParameter("siteIds", siteIds);
+		
 		List<Object[]> assetList =  q2.getResultList();
 		LOGGER.info("Total Assets for user : "+  assetList.size());
 		
