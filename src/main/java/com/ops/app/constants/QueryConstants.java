@@ -24,4 +24,8 @@ public class QueryConstants {
 			+ " c.category_name, c.asset_type from pm_asset a, pm_site s, pm_asset_category c"
 			+ " where a.site_id=s.site_id and c.category_id=a.category_id and a.del_flag=0 and s.site_id in ( ";
 	
+	public final static String SP_LIST_QUERY="select s.sp_id, s.sp_name, s.sp_email, u.company_id, "
+			+" s.country_id, u.user_id from pm_service_provider s, pm_users u, pm_company c2 "
+			+" where  c2.company_id=u.company_id and u.user_id=:userId";
+	
 }

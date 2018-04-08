@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.annotation.ObjectIdGenerators.UUIDGenerator;
+import com.ops.app.constants.QueryConstants;
 import com.ops.app.security.AuthorizedUserDetails;
 import com.ops.app.util.QuickPasswordEncodingGenerator;
 import com.ops.app.vo.EscalationLevelVO;
@@ -70,6 +73,10 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 	
 	@Autowired
 	private JDBCQueryDAO jdbcQueryDAO;
+	
+
+	@Autowired
+	private EntityManager entityManager;
 
 	@Override
 	@Transactional
@@ -262,14 +269,26 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 	}
 
 	@Override
-	@Transactional
 	public List<ServiceProviderVO> findAllServiceProvider(  LoginUser user ) throws Exception {
 		logger.info("Inside ServiceProviderServiceImpl -- findAllServiceProvider");
 		logger.info("Getting Service Provider List for logged in user : "+  user.getFirstName() + " " + user.getLastName());
-		List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(user.getUserId());
+	//	List<UserSiteAccess> userSiteAccessList = userSiteAccessRepo.findSiteAssignedFor(user.getUserId());
+		String ejbQl1 = QueryConstants.SP_LIST_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl1);
+		q.setParameter("userId", user.getUserId());
+		List<Object[]> serviceProviderList =  q.getResultList();
 		List<ServiceProviderVO> serviceProviderVOList = new ArrayList<ServiceProviderVO>();
-
-		if(userSiteAccessList.isEmpty()){
+		
+		if(!serviceProviderList.isEmpty()){
+			for(Object[] result: serviceProviderList){
+				ServiceProviderVO serviceProviderVO = new ServiceProviderVO();
+				serviceProviderVO.setServiceProviderId(Long.parseLong(result[0].toString()));
+				serviceProviderVO.setName(result[1]==null?"":result[1].toString());
+				serviceProviderVO.setEmail(result[2]==null?"":result[2].toString());
+				serviceProviderVOList.add(serviceProviderVO);
+			}
+		}
+		/*if(userSiteAccessList.isEmpty()){
 			logger.info("User donot have any access to sites");
 		}else{
 			Set<Long> serviceProviderIdSet = new HashSet<Long>();
@@ -294,7 +313,7 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 				logger.info("Total Service Provider for user : "+  serviceProviderList.size());	
 				serviceProviderVOList = getServiceProviderList(serviceProviderList, serviceProviderVOList);
 			}
-		}
+		}*/
 		logger.info("Exit ServiceProviderServiceImpl -- findAllServiceProvider");
 		return serviceProviderVOList ==  null ? Collections.EMPTY_LIST:serviceProviderVOList;
 	}
