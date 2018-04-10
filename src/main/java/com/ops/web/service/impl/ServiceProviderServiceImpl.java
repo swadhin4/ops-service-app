@@ -239,6 +239,10 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 			serviceProviderVO.setServiceProviderId(serviceProvider.getServiceProviderId());
 			serviceProviderVO.setEmail(serviceProvider.getHelpDeskEmail());
 			serviceProviderVO.setName(serviceProvider.getName());
+			serviceProviderVO.setCode(serviceProvider.getCode()==null?"":serviceProvider.getCode());
+			serviceProviderVO.setHelpDeskEmail(serviceProvider.getHelpDeskEmail()==null?"":serviceProvider.getHelpDeskEmail());
+			serviceProviderVO.setHelpDeskNumber(serviceProvider.getHelpDeskNumber()==null?"":String.valueOf(serviceProvider.getHelpDeskNumber()));
+			serviceProviderVO.setCountry(serviceProvider.getCountry());
 			List<SPEscalationLevels> escalationLevels  = spEscLevelRepo.findByServiceProviderServiceProviderId(serviceProvider.getServiceProviderId());
 			 for(SPEscalationLevels escLevel :  escalationLevels){
 				 EscalationLevelVO escalationLevelVO = new EscalationLevelVO();
@@ -264,6 +268,34 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 				 escalationLevelVO.setEscalationEmail(escLevel.getEscalationEmail());
 				 serviceProviderVO.getEscalationLevelList().add(escalationLevelVO);
 			 }
+			 
+			 List<ServiceProviderSLADetails> spSLAList = spSLARepo.findByServiceProviderServiceProviderId(serviceProvider.getServiceProviderId());
+
+				for(ServiceProviderSLADetails spSLADetails: spSLAList){
+					SLADetailsVO slaDetailsVO = new SLADetailsVO();
+					slaDetailsVO.setSlaId(spSLADetails.getSlaId());
+					//slaDetailsVO.setTicketPriority(spSLADetails.getTicketPriority());
+					TicketPriority ticketPriority = new TicketPriority();
+					ticketPriority.setPriorityId(spSLADetails.getPriorityId());
+					if(spSLADetails.getPriorityId()!=null){
+						if(spSLADetails.getPriorityId().intValue() == 1){
+							ticketPriority.setDescription(TicketPriorityEnum.CRITICAL.name());
+						}
+						else if(spSLADetails.getPriorityId().intValue() == 2){
+							ticketPriority.setDescription(TicketPriorityEnum.HIGH.name());
+						}
+						else if(spSLADetails.getPriorityId().intValue() == 3){
+							ticketPriority.setDescription(TicketPriorityEnum.MEDIUM.name());
+						}
+						else if(spSLADetails.getPriorityId().intValue() == 4){
+							ticketPriority.setDescription(TicketPriorityEnum.LOW.name());
+						}
+						slaDetailsVO.setTicketPriority(ticketPriority);
+						slaDetailsVO.setDuration(String.valueOf(spSLADetails.getDuration()));
+						slaDetailsVO.setUnit(spSLADetails.getUnit());
+						serviceProviderVO.getSlaListVOList().add(slaDetailsVO);
+					}
+				}
 		}
 		return serviceProviderVO;
 	}

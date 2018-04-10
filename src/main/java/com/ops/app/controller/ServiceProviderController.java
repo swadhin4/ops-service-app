@@ -63,7 +63,7 @@ public class ServiceProviderController  {
 					response.setStatusCode(404);
 					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
 				}else{
-					Collections.sort(serviceProviderVOs, ServiceProviderVO.COMPARE_BY_SPNAME);
+					//Collections.sort(serviceProviderVOs, ServiceProviderVO.COMPARE_BY_SPNAME);
 					response.setStatusCode(200);
 					response.setObject(serviceProviderVOs);
 					responseEntity = new  ResponseEntity<RestResponse>(response, HttpStatus.OK);
