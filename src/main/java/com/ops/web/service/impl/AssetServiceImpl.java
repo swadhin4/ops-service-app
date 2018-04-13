@@ -89,7 +89,7 @@ public class AssetServiceImpl implements AssetService{
 				siteIds.add(result[0].toString());
 			}
 			String sites=String.join(",", siteIds);
-		String ejbQl2 = QueryConstants.USER_SITE_ASSET_QUERY + sites + " )";
+		String ejbQl2 = QueryConstants.USER_SITE_ASSET_QUERY + sites + " ) order by a.asset_name";
 		Query q2= entityManager.createNativeQuery(ejbQl2);
 		
 		List<Object[]> assetList =  q2.getResultList();

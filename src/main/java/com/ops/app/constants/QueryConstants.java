@@ -14,7 +14,7 @@ public class QueryConstants {
 			+ " s.primary_contact_number, s.email, s.site_number1,"
 			+ " s.site_address1, s.site_address2, s.site_address3, s.site_address4, s.post_code"
 			+ " from pm_site s inner join pm_user_access uc on s.site_id = uc.site_id and uc.user_id=:userId "
-			+ " order by s.created_date desc";
+			+ " order by s.site_name";
 	
 	public final static String SITE_ACCESS_QUERY="select s.site_id, s.site_name "
 			+ " from pm_site s inner join pm_user_access uc on s.site_id = uc.site_id and uc.user_id=:userId "
@@ -26,6 +26,6 @@ public class QueryConstants {
 	
 	public final static String SP_LIST_QUERY="select s.sp_id, s.sp_name, s.sp_email, u.company_id, "
 			+" s.customer_id, u.user_id from pm_service_provider s, pm_users u, pm_company c2 "
-			+" where  s.customer_id=u.company_id and c2.company_id = u.company_id and u.user_id=:userId";
+			+" where  s.customer_id=u.company_id and c2.company_id = u.company_id and u.user_id=:userId order by s.sp_name";
 	
 }
