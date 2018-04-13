@@ -243,7 +243,9 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 			serviceProviderVO.setHelpDeskEmail(serviceProvider.getHelpDeskEmail()==null?"":serviceProvider.getHelpDeskEmail());
 			serviceProviderVO.setHelpDeskNumber(serviceProvider.getHelpDeskNumber()==null?"":String.valueOf(serviceProvider.getHelpDeskNumber()));
 			serviceProviderVO.setCountry(serviceProvider.getCountry());
+			serviceProviderVO.setAdditionalDetails(serviceProvider.getAdditionalDetails());
 			List<SPEscalationLevels> escalationLevels  = spEscLevelRepo.findByServiceProviderServiceProviderId(serviceProvider.getServiceProviderId());
+			serviceProviderVO.setSlaDescription(serviceProvider.getSlaDescription());
 			 for(SPEscalationLevels escLevel :  escalationLevels){
 				 EscalationLevelVO escalationLevelVO = new EscalationLevelVO();
 				 escalationLevelVO.setEscId(escLevel.getEscId());
