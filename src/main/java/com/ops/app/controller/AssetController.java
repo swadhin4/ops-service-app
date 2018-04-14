@@ -117,14 +117,21 @@ public class AssetController {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity<RestResponse> createNewAsset(final Locale locale, final ModelMap model,
-			@RequestBody final AssetVO assetVO) {
+	public ResponseEntity<RestResponse> createNewAsset(@RequestBody final AssetVO assetVO) {
 		logger.info("Inside AssetController .. createNewAsset");
 		RestResponse response = new RestResponse();
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
 		try {
 			logger.info("AssetVO : " + assetVO);
-			response = assetService.saveOrUpdateAsset(assetVO, null);
+			UserVO user = userService.findUserByUsername(assetVO.getCreatedBy());
+			if (user.getUserId() != null) {
+				LoginUser authorizedUser = new LoginUser();
+				authorizedUser.setEmail(user.getEmailId());
+				authorizedUser.setFirstName(user.getFirstName());
+				authorizedUser.setLastName(user.getLastName());
+				authorizedUser.setUserId(user.getUserId());
+				authorizedUser.setCompany(user.getCompany());
+			response = assetService.saveOrUpdateAsset(assetVO, authorizedUser);
 			if (response.getStatusCode() == 200) {
 				if (response.getMode().equals("SAVING")) {
 					response.setStatusCode(200);
@@ -140,7 +147,7 @@ public class AssetController {
 				response.setMessage("Asset code already exists for selected site");
 				responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
 			}
-
+			}
 		} catch (Exception e) {
 			logger.info("Exception in getting response", e);
 			response.setMessage("Exception while creating an asset");

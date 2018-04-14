@@ -104,5 +104,4 @@ public class ServiceProviderController  {
 		return responseEntity;
 	}
 	
-	
 }

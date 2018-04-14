@@ -28,4 +28,6 @@ public class QueryConstants {
 			+" s.customer_id, u.user_id from pm_service_provider s, pm_users u, pm_company c2 "
 			+" where  s.customer_id=u.company_id and c2.company_id = u.company_id and u.user_id=:userId order by s.sp_name";
 	
+	
+	
 }

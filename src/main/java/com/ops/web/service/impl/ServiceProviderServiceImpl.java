@@ -359,13 +359,25 @@ public class ServiceProviderServiceImpl implements ServiceProviderService {
 	}
 
 	@Override
-	@Transactional
 	public List<ServiceProviderVO> findServiceProviderByCustomer(Long customerId)
 			throws Exception {
 		logger.info("Inside ServiceProviderServiceImpl -- findAllServiceProvider");
+		//List<ServiceProvider> serviceProviderList = serviceProvderRepo.findByCompany(customerId);
+		String ejbQl1 = QueryConstants.SP_LIST_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl1);
+		q.setParameter("userCompanyId", customerId);
+		List<Object[]> serviceProviderList =  q.getResultList();
 		List<ServiceProviderVO> serviceProviderVOList = new ArrayList<ServiceProviderVO>();
-		List<ServiceProvider> serviceProviderList = serviceProvderRepo.findByCompany(customerId);
-		serviceProviderVOList = getServiceProviderList(serviceProviderList, serviceProviderVOList);
+		
+		if(!serviceProviderList.isEmpty()){
+			for(Object[] result: serviceProviderList){
+				ServiceProviderVO serviceProviderVO = new ServiceProviderVO();
+				serviceProviderVO.setServiceProviderId(Long.parseLong(result[0].toString()));
+				serviceProviderVO.setName(result[1]==null?"":result[1].toString());
+				serviceProviderVO.setEmail(result[2]==null?"":result[2].toString());
+				serviceProviderVOList.add(serviceProviderVO);
+			}
+		}
 		logger.info("Exit ServiceProviderServiceImpl -- findAllServiceProvider");
 		return serviceProviderVOList ==  null ? Collections.EMPTY_LIST:serviceProviderVOList;
 	}
