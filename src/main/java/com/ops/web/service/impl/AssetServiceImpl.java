@@ -426,7 +426,7 @@ public class AssetServiceImpl implements AssetService{
 				asset.setSiteId(site);
 				asset.setCreatedBy(user.getUsername());
 				//savedAssetVO = saveOrUpdateAssetSites(assetVO, asset, assetVOList);
-				SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				if(!StringUtils.isEmpty(assetVO.getCommisionedDate())){
 					Date commDate;
 					try {
@@ -494,10 +494,10 @@ public class AssetServiceImpl implements AssetService{
 						}
 					}
 					
-					if(!StringUtils.isEmpty(assetVO.getAssetDoc().getBase64ImageString())){
+					/*if(!StringUtils.isEmpty(assetVO.getAssetDoc().getBase64ImageString())){
 						LOGGER.info("Asset Document uploading..");
 						assetVO = uploadAssetFiles(assetVO, user, "DOC", user.getCompany(), savedAssetList.get(0));
-					}
+					}*/
 				}
 				
 			}
