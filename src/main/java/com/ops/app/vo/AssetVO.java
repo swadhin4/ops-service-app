@@ -65,9 +65,9 @@ public class AssetVO  {
 
 	private String mode;
 
-	private UploadFile assetImage;
+	private UploadFile assetImage = new UploadFile(); 
 	
-	private UploadFile assetDoc;
+	private UploadFile assetDoc = new UploadFile();
 	
 	private int delFlag;
 	

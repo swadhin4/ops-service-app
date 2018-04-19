@@ -262,11 +262,11 @@ public class AssetServiceImpl implements AssetService{
 		RestResponse response = new RestResponse();
 		List<Asset> assetList=new ArrayList<Asset>();
 		boolean isAssetAvailable=false;
-		Set<Long> uniqueSites = new HashSet<>(assetVO.getSites());
-		LOGGER.info("No sites selected for asset : "+ uniqueSites);
-		if(uniqueSites.size() == 0){
-			LOGGER.info("No sites selected for asset : "+ assetVO.getAssetName());
-		}else{
+	//	Set<Long> uniqueSites = new HashSet<>(assetVO.getSites());
+		//LOGGER.info("No sites selected for asset : "+ uniqueSites);
+		//if(uniqueSites.size() == 0){
+			//LOGGER.info("No sites selected for asset : "+ assetVO.getAssetName());
+		//}else{
 			if(assetVO.getAssetId() == null){
 				assetList= assetRepo.findByAssetCodeAndSiteIdInAndDelFlag(assetVO.getAssetCode(), assetVO.getSites(), 0);
 				
@@ -288,6 +288,7 @@ public class AssetServiceImpl implements AssetService{
 					response.setStatusCode(204);
 				}
 			}else{
+				assetVO.getSites().add(assetVO.getSiteId());
 				assetList = assetRepo.findByAssetCodeAndSiteIdInAndDelFlag(assetVO.getAssetCode(), assetVO.getSites(),0);
 				if(assetList.isEmpty()){
 					LOGGER.info("No asset found for asset code : "+ assetVO.getAssetCode() +" and for sites :"+ assetVO.getSites());
@@ -315,7 +316,7 @@ public class AssetServiceImpl implements AssetService{
 					}
 				}
 			}
-		}
+		//}
 		
 		LOGGER.info("Exit AssetServiceImpl .. saveOrUpdateAsset");
 		return response;
@@ -396,14 +397,14 @@ public class AssetServiceImpl implements AssetService{
 			}
 			assetVO.getSites().add(assetVO.getSiteId());
 			
-			if(assetVO.getAssetType().equalsIgnoreCase("E")){
-				if(!StringUtils.isEmpty(assetVO.getAssetImage().getBase64ImageString())){
+		/*	if(assetVO.getAssetType().equalsIgnoreCase("E")){
+				if(!org.apache.commons.lang3.StringUtils.isBlank(assetVO.getAssetImage().getBase64ImageString())){
 					assetVO = uploadAssetFiles(assetVO, user, "IMAGE", user.getCompany(), asset);
 					
 				}
 			}
 				
-			if(!StringUtils.isEmpty(assetVO.getAssetDoc().getBase64ImageString())){
+			if(!org.apache.commons.lang3.StringUtils.isBlank(assetVO.getAssetDoc().getBase64ImageString())){
 				assetVO = uploadAssetFiles(assetVO, user, "DOC", user.getCompany(), asset);
 			}
 			if(org.apache.commons.lang3.StringUtils.isNotBlank(assetVO.getImagePath())){
@@ -411,8 +412,8 @@ public class AssetServiceImpl implements AssetService{
 			}
 			if(org.apache.commons.lang3.StringUtils.isNotBlank(assetVO.getDocumentPath())){
 				asset.setDocumentPath(assetVO.getDocumentPath());
-			}
-				asset = assetRepo.save(asset);
+			}*/
+				Asset savedAsset = assetRepo.save(asset);
 			assetVOList.add(assetVO);
 			return assetVOList;
 		}
@@ -487,12 +488,12 @@ public class AssetServiceImpl implements AssetService{
 				}
 				
 				if(assetVO.getSites().size()==1){
-					if(assetVO.getAssetType().equalsIgnoreCase("E")){
+					/*if(assetVO.getAssetType().equalsIgnoreCase("E")){
 						if(!StringUtils.isEmpty(assetVO.getAssetImage().getBase64ImageString())){
 							LOGGER.info("Asset Image uploading..");
 							assetVO = uploadAssetFiles(assetVO, user, "IMAGE", user.getCompany(), savedAssetList.get(0));
 						}
-					}
+					}*/
 					
 					/*if(!StringUtils.isEmpty(assetVO.getAssetDoc().getBase64ImageString())){
 						LOGGER.info("Asset Document uploading..");
