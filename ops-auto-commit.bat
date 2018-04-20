@@ -1,4 +1,4 @@
-xcopy "G:\project-repo\ionic-ops-ui\service-app\src" "H:\git-projects\ops-service-app\src" /E /D
+xcopy "D:\TechM\SM351137\workspace\ops-oauth-app\src" "D:\TechM\SM351137\GIT\ops-service-app\src" /E /D
 @echo off
 echo type "commit" or "update"
 cd "curl"

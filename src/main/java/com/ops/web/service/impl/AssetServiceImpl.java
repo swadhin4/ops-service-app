@@ -255,7 +255,6 @@ public class AssetServiceImpl implements AssetService{
 	}
 
 	@Override
-	@Transactional
 	public RestResponse saveOrUpdateAsset(AssetVO assetVO, LoginUser user) throws Exception {
 		LOGGER.info("Inside AssetServiceImpl .. saveOrUpdateAsset");
 		List<AssetVO> assetVOList = new ArrayList<AssetVO>();
