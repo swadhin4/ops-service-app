@@ -90,8 +90,7 @@ public class Asset implements Serializable {
 	private int delFlag = 0;
 	
 
-	@Version
-	private int version = 0;
+	private int version;
 
 
 

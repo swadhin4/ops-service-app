@@ -262,11 +262,11 @@ public class AssetServiceImpl implements AssetService{
 		RestResponse response = new RestResponse();
 		List<Asset> assetList=new ArrayList<Asset>();
 		boolean isAssetAvailable=false;
-	//	Set<Long> uniqueSites = new HashSet<>(assetVO.getSites());
-		//LOGGER.info("No sites selected for asset : "+ uniqueSites);
-		//if(uniqueSites.size() == 0){
-			//LOGGER.info("No sites selected for asset : "+ assetVO.getAssetName());
-		//}else{
+		Set<Long> uniqueSites = new HashSet<>(assetVO.getSites());
+			LOGGER.info("No sites selected for asset : "+ uniqueSites);
+		if(uniqueSites.size() == 0){
+		  LOGGER.info("No sites selected for asset : "+ assetVO.getAssetName());
+		}else{
 			if(assetVO.getAssetId() == null){
 				assetList= assetRepo.findByAssetCodeAndSiteIdInAndDelFlag(assetVO.getAssetCode(), assetVO.getSites(), 0);
 				
@@ -288,7 +288,6 @@ public class AssetServiceImpl implements AssetService{
 					response.setStatusCode(204);
 				}
 			}else{
-				assetVO.getSites().add(assetVO.getSiteId());
 				assetList = assetRepo.findByAssetCodeAndSiteIdInAndDelFlag(assetVO.getAssetCode(), assetVO.getSites(),0);
 				if(assetList.isEmpty()){
 					LOGGER.info("No asset found for asset code : "+ assetVO.getAssetCode() +" and for sites :"+ assetVO.getSites());
@@ -316,7 +315,7 @@ public class AssetServiceImpl implements AssetService{
 					}
 				}
 			}
-		//}
+		}
 		
 		LOGGER.info("Exit AssetServiceImpl .. saveOrUpdateAsset");
 		return response;
@@ -340,7 +339,7 @@ public class AssetServiceImpl implements AssetService{
 
 		private List<AssetVO> updateAssetForSite(AssetVO assetVO, LoginUser user, List<AssetVO> assetVOList, Asset asset) {
 			
-			BeanUtils.copyProperties(assetVO, asset);
+			BeanUtils.copyProperties(assetVO, asset,"assetId");
 			asset.setModifiedBy(user.getUsername());
 			asset.setModifiedDate(new Date());
 			//assetVO = saveOrUpdateAssetSites(assetVO, asset, assetVOList);
