@@ -195,7 +195,8 @@ public class SiteServiceImpl implements SiteService{
 				String finalAddress = org.apache.commons.lang3.StringUtils.join(fullAddress,",");
 				siteVO.setFullAddress(finalAddress);
 				
-				siteVO.setOperator(site.getOperator()); 
+				siteVO.getOperator().setCompanyId(site.getOperator().getCompanyId());
+				siteVO.getOperator().setCompanyName(site.getOperator().getCompanyName());
 				
 				siteVO.setOwner(site.getSiteOwner());
 
@@ -331,7 +332,32 @@ public class SiteServiceImpl implements SiteService{
 		LOGGER.info("Exit SiteServiceImpl - saveOrUpdate");
 		return siteVO;
 	}
-
+	@Override
+	public CreateSiteVO updateSite(CreateSiteVO siteVO, LoginUser loginUser) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - updateSite");
+		CreateSiteVO savedSiteVO = new CreateSiteVO();
+		if(siteVO.getSiteId() != null){
+			Site savedSite = siteRepo.findOne(siteVO.getSiteId());
+			savedSite.setModifiedBy(loginUser.getUsername());
+			Company company = loginUser.getCompany();
+			savedSite.setOperator(company);
+			try{
+				savedSite=populateSitePrimaryData(savedSite,siteVO, company);
+				savedSite.setOperator(company);
+				savedSite = siteRepo.save(savedSite);
+				if(savedSite.getVersion()>0){
+					LOGGER.info("Site information updated successfully");
+					savedSiteVO.setSiteId(savedSite.getSiteId());
+					savedSiteVO.setSiteName(savedSite.getSiteName());
+				}
+			}catch(Exception e){
+				LOGGER.info("Exception while updating site information :");
+				e.printStackTrace();
+			}
+		}
+		LOGGER.info("Exit SiteServiceImpl - updateSite");
+		return savedSiteVO;
+	}
 	@Override
 	@Transactional
 	public CreateSiteVO saveOrUpdate(final CreateSiteVO siteVO, LoginUser user) throws Exception {
@@ -349,7 +375,6 @@ public class SiteServiceImpl implements SiteService{
 				savedSite = siteRepo.findOne(siteVO.getSiteId());
 				savedSite.setModifiedBy(user.getUsername());
 			}
-
 			
 			try{
 				savedSite=populateSitePrimaryData(savedSite,siteVO, user.getCompany());
@@ -1285,6 +1310,8 @@ public class SiteServiceImpl implements SiteService{
 		LOGGER.info("Exit SiteServiceImpl - getSiteSubmeterVO");
 		return subMeterVo==null?Collections.EMPTY_LIST:subMeterVo;
 	}
+
+	
 
 
 }

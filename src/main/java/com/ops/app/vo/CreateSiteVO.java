@@ -15,9 +15,7 @@ public class CreateSiteVO {
 
 	private Long siteId;
 
-	@Required
 	private String siteName;
-	@Required
 	private String owner;
 	private District district = new District();
 	private Area area = new Area();
@@ -25,16 +23,12 @@ public class CreateSiteVO {
 	private Company operator = new Company();
 
 	private String electricityId;
-	@Required
 	private String siteNumber1;
 	private String siteNumber2;
-	@Required
 	private String contactName;
-	@Required
 	private String email;
 	private String longitude;
 	private String latitude;
-	@Required
 	private String primaryContact;
 	private String secondaryContact;
 	private String siteAddress1;

@@ -17,6 +17,8 @@ public interface SiteService {
 	public List<CreateSiteVO> getSiteList(LoginUser user) throws Exception;
 
 	public CreateSiteVO saveOrUpdate(CreateSiteVO siteVO, LoginUser loginUser) throws Exception;
+	
+	public CreateSiteVO updateSite(CreateSiteVO siteVO, LoginUser loginUser) throws Exception;
 
 	public CreateSiteVO getSiteDetails(Long siteId) throws Exception;
 	
