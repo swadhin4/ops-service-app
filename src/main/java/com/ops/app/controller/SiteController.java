@@ -89,7 +89,44 @@ public class SiteController  {
 			return responseEntity;
 		}
 
-		
+	@RequestMapping(value = "/v1/contact/update", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<RestResponse> updateSiteContact(@RequestBody final CreateSiteVO createSiteVO) {
+		logger.info("Inside SiteController .. updateSiteContact");
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+			try {
+				logger.info("CreateSiteVO : "+ createSiteVO);
+				 if(createSiteVO.getSiteId() != null){
+					 UserVO user = userService.findUserByUsername(createSiteVO.getCreatedBy());
+						if(user.getUserId()!=null){
+							LoginUser authorizedUser = new LoginUser();
+							authorizedUser.setEmail(user.getEmailId());
+							authorizedUser.setFirstName(user.getFirstName());
+							authorizedUser.setLastName(user.getLastName());
+							authorizedUser.setUserId(user.getUserId());
+							CreateSiteVO savedSiteVO = siteService.updateSiteContact(createSiteVO,authorizedUser );
+							response.setStatusCode(200);
+							response.setObject(savedSiteVO);
+							response.setMessage("Site Contact updated successfully");
+							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+						}else{
+							response.setStatusCode(401);
+							response.setMessage("User is not authorized");
+							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.UNAUTHORIZED);
+						}
+				}
+
+			} catch (Exception e) {
+				logger.info("Exception occured while saving or updating site", e);
+				response.setMessage("Exception occured while saving or updating site");
+				response.setStatusCode(500);
+				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+
+			}
+			logger.info("Exit SiteController .. updateSiteContact");
+			return responseEntity;
+		}
+	
 	
 	@RequestMapping(value = "/v1/selected/{siteId}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<RestResponse> getSelectedSite(@PathVariable(value="siteId") Long siteId) {

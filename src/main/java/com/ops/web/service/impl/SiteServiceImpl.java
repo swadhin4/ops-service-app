@@ -358,6 +358,34 @@ public class SiteServiceImpl implements SiteService{
 		LOGGER.info("Exit SiteServiceImpl - updateSite");
 		return savedSiteVO;
 	}
+	
+	@Override
+	public CreateSiteVO updateSiteContact(CreateSiteVO siteVO, LoginUser loginUser) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - updateSite");
+		CreateSiteVO savedSiteVO = new CreateSiteVO();
+		if(siteVO.getSiteId() != null){
+			Site savedSite = siteRepo.findOne(siteVO.getSiteId());
+			savedSite.setModifiedBy(loginUser.getUsername());
+			Company company = loginUser.getCompany();
+			savedSite.setOperator(company);
+			try{
+				savedSite=populateSiteContact(savedSite,siteVO);
+				savedSite = siteRepo.save(savedSite);
+				if(savedSite.getVersion()>0){
+					LOGGER.info("Site Contact information updated successfully");
+					savedSiteVO.setSiteId(savedSite.getSiteId());
+					savedSiteVO.setSiteName(savedSite.getSiteName());
+				}
+			}catch(Exception e){
+				LOGGER.info("Exception while updating site information :");
+				e.printStackTrace();
+			}
+		}
+		LOGGER.info("Exit SiteServiceImpl - updateSite");
+		return savedSiteVO;
+	}
+
+	
 	@Override
 	@Transactional
 	public CreateSiteVO saveOrUpdate(final CreateSiteVO siteVO, LoginUser user) throws Exception {
@@ -1205,9 +1233,10 @@ public class SiteServiceImpl implements SiteService{
 			siteContactVO.setSecondaryContact(site.getSecondaryContact().toString());
 		}
 
-	
+		if(site.getOperator()!=null){
 		siteContactVO.setOperator(site.getOperator().getCompanyName()); 
 		siteContactVO.setOwner(site.getSiteOwner());
+		}
 		LOGGER.info("Exit SiteServiceImpl - getSiteContacts");
 		return siteContactVO;
 		
@@ -1230,6 +1259,7 @@ public class SiteServiceImpl implements SiteService{
 					Date licenseValidFrom =  siteLicence.getStartDate();
 					Date licenseValidTo  = siteLicence.getEndDate();
 					String startDate = formatter.format(licenseValidFrom);
+		
 					String endDate = formatter.format(licenseValidTo);
 					siteLicenceVO.setValidfrom(startDate);
 					siteLicenceVO.setValidto(endDate);

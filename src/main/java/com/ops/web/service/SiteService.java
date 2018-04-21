@@ -33,6 +33,8 @@ public interface SiteService {
 	public List<SiteDeliveryVO> getSiteDeliveryVO(Long siteId) throws Exception;
 	
 	public List<SiteSubmeterVO> getSiteSubmeterVO(Long siteId) throws Exception;
+
+	public CreateSiteVO updateSiteContact(CreateSiteVO createSiteVO, LoginUser authorizedUser) throws Exception;
 	
 	
 }
