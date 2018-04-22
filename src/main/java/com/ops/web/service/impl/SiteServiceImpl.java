@@ -990,6 +990,7 @@ public class SiteServiceImpl implements SiteService{
 			site.setSiteSubmeterList(subMeterList);
 			siteVO.setSiteId(site.getSiteId());
 			siteVO.setSiteName(site.getSiteName());
+			
 			siteVO.setSiteAddress1(site.getSiteAddress1());
 			siteVO.setSiteAddress2(site.getSiteAddress2());
 			siteVO.setSiteAddress3(site.getSiteAddress3());
@@ -1189,8 +1190,14 @@ public class SiteServiceImpl implements SiteService{
 		SiteContactVO siteContactVO = new SiteContactVO();
 		siteContactVO.setSiteId(site.getSiteId());
 		siteContactVO.setSiteName(site.getSiteName());
-		siteContactVO.setZipCode(site.getPostCode()==null?"":site.getPostCode());
+		
 		siteContactVO.setContactName(site.getAreaManagerName());
+		
+		siteContactVO.setSiteAddress1(site.getSiteAddress1()==null?"":site.getSiteAddress1());
+		siteContactVO.setSiteAddress2(site.getSiteAddress2()==null?"":site.getSiteAddress2());
+		siteContactVO.setSiteAddress3(site.getSiteAddress3()==null?"":site.getSiteAddress3());
+		siteContactVO.setSiteAddress4(site.getSiteAddress4()==null?"":site.getSiteAddress4());
+		siteContactVO.setZipCode(site.getPostCode()==null?"":site.getPostCode());
 		
 		if(!StringUtils.isEmpty(site.getSiteAddress1())){
 			fullAddress.add(site.getSiteAddress1());
