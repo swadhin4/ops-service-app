@@ -385,6 +385,46 @@ public class SiteServiceImpl implements SiteService{
 		return savedSiteVO;
 	}
 
+	@Override
+	public SiteLicenceVO updateSiteLicense(Long siteId, SiteLicenceVO siteLicenseVO) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - updateSiteLicense");
+		Site savedSite = siteRepo.findOne(siteId);
+		SiteLicence siteLicence = null;
+		if(siteLicenseVO.getLicenseId() != null){
+			siteLicence = licenseRepo.findOne(siteLicenseVO.getLicenseId());
+		}else {
+			 siteLicence = new SiteLicence();
+		}
+			siteLicence.setLicenceName(siteLicenseVO.getLicenseName());
+			siteLicence.setSite(savedSite);
+			String licenceFromData = siteLicenseVO.getValidfrom();
+			String licenceToData = siteLicenseVO.getValidto();
+
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
+			if(!StringUtils.isEmpty(licenceFromData) && !StringUtils.isEmpty(licenceToData)){
+				Date licenseValidFrom;
+				Date licenseValidTo;
+				try {
+					licenseValidFrom = formatter.parse(licenceFromData);
+					licenseValidTo = formatter.parse(licenceToData);
+					siteLicence.setStartDate(licenseValidFrom);
+					siteLicence.setEndDate(licenseValidTo);
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				siteLicence =  licenseRepo.save(siteLicence);
+				if(siteLicence.getLicenseId()!=null){
+					LOGGER.info("Site license updated successfully.");
+					siteLicenseVO.setLicenseId(siteLicence.getLicenseId());
+				}
+				
+			
+		}
+		LOGGER.info("Exit SiteServiceImpl - updateSiteLicense");
+		return siteLicenseVO;
+	}
+
+	
 	
 	@Override
 	@Transactional
@@ -724,7 +764,7 @@ public class SiteServiceImpl implements SiteService{
 			String licenceFromData = siteLicenceVO.getValidfrom();
 			String licenceToData = siteLicenceVO.getValidto();
 
-			SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+			SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 			if(!StringUtils.isEmpty(licenceFromData) && !StringUtils.isEmpty(licenceToData)){
 				Date licenseValidFrom;
 				Date licenseValidTo;
@@ -1079,7 +1119,7 @@ public class SiteServiceImpl implements SiteService{
 					siteLicenceVO.setLicenseName(siteLicence.getLicenseName());
 					siteLicenceVO.setAttachment(siteLicence.getAttachmentPath());
 					
-					SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+					SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 					if(siteLicence.getStartDate()!=null && siteLicence.getEndDate()!=null){
 						Date licenseValidFrom =  siteLicence.getStartDate();
 						Date licenseValidTo  = siteLicence.getEndDate();
@@ -1261,7 +1301,7 @@ public class SiteServiceImpl implements SiteService{
 				siteLicenceVO.setLicenseName(siteLicence.getLicenseName());
 				siteLicenceVO.setAttachment(siteLicence.getAttachmentPath());
 				
-				SimpleDateFormat formatter = new SimpleDateFormat("dd-MM-yyyy");
+				SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
 				if(siteLicence.getStartDate()!=null && siteLicence.getEndDate()!=null){
 					Date licenseValidFrom =  siteLicence.getStartDate();
 					Date licenseValidTo  = siteLicence.getEndDate();
@@ -1348,7 +1388,20 @@ public class SiteServiceImpl implements SiteService{
 		return subMeterVo==null?Collections.EMPTY_LIST:subMeterVo;
 	}
 
-	
+	@Override
+	public int deleteLicense(Long licenseId) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - deleteLicense");
+		SiteLicence siteLicence = licenseRepo.findOne(licenseId);
+		int isDeleted=0;
+		if(siteLicence!=null){
+			isDeleted=1;
+			licenseRepo.delete(licenseId);
+		}
+		
+		LOGGER.info("Exit SiteServiceImpl - deleteLicense");
+		return isDeleted;
+	}
+
 
 
 }

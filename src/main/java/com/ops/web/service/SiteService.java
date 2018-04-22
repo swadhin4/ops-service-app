@@ -35,6 +35,11 @@ public interface SiteService {
 	public List<SiteSubmeterVO> getSiteSubmeterVO(Long siteId) throws Exception;
 
 	public CreateSiteVO updateSiteContact(CreateSiteVO createSiteVO, LoginUser authorizedUser) throws Exception;
+
+	public SiteLicenceVO updateSiteLicense(Long siteId, SiteLicenceVO siteLicenseVO) throws Exception;
+
+	public int deleteLicense(Long licenseId)throws Exception;
+
 	
 	
 }
