@@ -301,6 +301,41 @@ public class SiteController {
 		return responseEntity;
 	}
 
+	@RequestMapping(value = "/v1/submeter/update/{siteId}", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<RestResponse> addOrUpdateSubmeter(@PathVariable(value = "siteId") Long siteId,
+			@RequestBody SiteSubmeterVO siteSubmeterVO) {
+		logger.info("Inside SiteController .. addOrUpdateSubmeter");
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+		try {
+			logger.info("SiteSubmeterVO : " + siteSubmeterVO);
+			SiteSubmeterVO savedSubmeterVO= siteService.addOrUpdateSubmeter(siteId, siteSubmeterVO);
+			if (savedSubmeterVO.getSubMeterId() != null) {
+				if(siteSubmeterVO.getSubMeterId()==null){
+					response.setStatusCode(200);
+					response.setObject(savedSubmeterVO);
+					response.setMessage("Site submeter saved successfully");
+					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+				}else if(siteSubmeterVO.getSubMeterId()!=null){
+					response.setStatusCode(200);
+					response.setObject(savedSubmeterVO);
+					response.setMessage("Site submeter updated successfully");
+					responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+				}
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception occured while saving or updating site", e);
+			response.setMessage("Exception occured while saving or updating site");
+			response.setStatusCode(500);
+			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+
+		}
+		logger.info("Exit SiteController .. addOrUpdateLicense");
+		return responseEntity;
+	}
+	
+	
 	@RequestMapping(value = "/v1/selected/operation/{siteId}", method = RequestMethod.GET, produces = "application/json")
 	public ResponseEntity<RestResponse> getSelectedSiteOps(@PathVariable(value = "siteId") Long siteId) {
 		logger.info("Inside SiteController .. getSelectedSiteOps");

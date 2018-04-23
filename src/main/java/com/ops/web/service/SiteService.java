@@ -40,6 +40,8 @@ public interface SiteService {
 
 	public int deleteLicense(Long licenseId)throws Exception;
 
+	public SiteSubmeterVO addOrUpdateSubmeter(Long siteId, SiteSubmeterVO siteSubmeterVO) throws Exception;
+
 	
 	
 }

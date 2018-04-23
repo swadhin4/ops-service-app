@@ -424,7 +424,38 @@ public class SiteServiceImpl implements SiteService{
 		return siteLicenseVO;
 	}
 
-	
+	@Override
+	public SiteSubmeterVO addOrUpdateSubmeter(Long siteId, SiteSubmeterVO siteSubmeterVO) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - addOrUpdateSubmeter");
+		Site savedSite = siteRepo.findOne(siteId);
+		SiteSubmeterVO savedSiteSubmeterVO=null;
+		if(siteSubmeterVO.getSubMeterId() != null){
+			LOGGER.info("Update Site Submeter : "+  siteSubmeterVO.getSubMeterNumber());
+			SiteSubMeter siteSubmeter = siteSubMeterRepo.findOne(siteSubmeterVO.getSubMeterId());
+			savedSiteSubmeterVO = persistSiteSubmeter(siteSubmeterVO, savedSite, siteSubmeter);
+		}else {
+			LOGGER.info("Creating new Site Submeter : "+siteSubmeterVO.getSubMeterNumber());
+			SiteSubMeter siteSubmeter = new SiteSubMeter();
+			savedSiteSubmeterVO = persistSiteSubmeter(siteSubmeterVO, savedSite, siteSubmeter);
+		}
+		LOGGER.info("Exit SiteServiceImpl - addOrUpdateSubmeter");
+		return savedSiteSubmeterVO;
+	}
+
+	private SiteSubmeterVO persistSiteSubmeter(SiteSubmeterVO siteSubmeterVO, Site savedSite, SiteSubMeter siteSubmeter) {
+		siteSubmeter.setSite(savedSite);
+		siteSubmeter.setSubMeterNumber(siteSubmeterVO.getSubMeterNumber());
+		siteSubmeter.setSubMeterUser(siteSubmeterVO.getSubMeterUser());
+		siteSubmeter= siteSubMeterRepo.save(siteSubmeter);
+		if(siteSubmeter.getSubMeterId()!=null){
+			LOGGER.info("Submeter created or updated successfully");
+			siteSubmeterVO.setSubMeterId(siteSubmeter.getSubMeterId());
+			siteSubmeterVO.setSubMeterNumber(siteSubmeter.getSubMeterNumber());
+			siteSubmeterVO.setSubMeterUser(siteSubmeter.getSubMeterUser()); 
+		}
+		return siteSubmeterVO;
+	}
+
 	
 	@Override
 	@Transactional
@@ -1402,6 +1433,7 @@ public class SiteServiceImpl implements SiteService{
 		return isDeleted;
 	}
 
+	
 
 
 }
