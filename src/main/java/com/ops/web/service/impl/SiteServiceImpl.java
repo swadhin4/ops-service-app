@@ -42,6 +42,7 @@ import com.ops.app.vo.SiteDeliveryVO;
 import com.ops.app.vo.SiteInfoVO;
 import com.ops.app.vo.SiteLicenceVO;
 import com.ops.app.vo.SiteOperationVO;
+import com.ops.app.vo.SiteOpsTimingVO;
 import com.ops.app.vo.SiteSubmeterVO;
 import com.ops.app.vo.SiteVO;
 import com.ops.app.vo.UploadFile;
@@ -385,6 +386,59 @@ public class SiteServiceImpl implements SiteService{
 		return savedSiteVO;
 	}
 
+	
+	@Override
+	public CreateSiteVO updateSiteOperationTimings(Long siteId, List<SiteOpsTimingVO> siteOperationVOList) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl - updateSiteOperationTimings");
+		CreateSiteVO siteVO = new CreateSiteVO();
+		try{
+			if(siteId != null){
+				Site savedSite = siteRepo.findOne(siteId);
+					siteVO.setSiteId(savedSite.getSiteId());
+					siteVO.setSiteName(savedSite.getSiteName());
+					List<SiteOperationVO> salesOpsTimings = new ArrayList<SiteOperationVO>();
+					List<SiteDeliveryVO> deliveryOpsTimings = new ArrayList<SiteDeliveryVO>();
+					for(SiteOpsTimingVO siteOpsTimingVO : siteOperationVOList){
+						if(siteOpsTimingVO.getType().equalsIgnoreCase("SOP")){
+							SiteOperationVO siteOperationVO = new SiteOperationVO();
+							siteOperationVO.setOpId(siteOpsTimingVO.getOpId());
+							siteOperationVO.setDays(siteOpsTimingVO.getDays());
+							siteOperationVO.setFrom(siteOpsTimingVO.getFrom());
+							siteOperationVO.setTo(siteOpsTimingVO.getTo());
+							salesOpsTimings.add(siteOperationVO);
+						}
+						
+						if(siteOpsTimingVO.getType().equalsIgnoreCase("DOP")){
+							SiteDeliveryVO siteDeliveryOperationVO = new SiteDeliveryVO();
+							siteDeliveryOperationVO.setOpId(siteOpsTimingVO.getOpId());
+							siteDeliveryOperationVO.setDays(siteOpsTimingVO.getDays());
+							siteDeliveryOperationVO.setFrom(siteOpsTimingVO.getFrom());
+							siteDeliveryOperationVO.setTo(siteOpsTimingVO.getTo());
+							deliveryOpsTimings.add(siteDeliveryOperationVO);
+						}
+					}
+					
+					siteVO.setSiteOperation(salesOpsTimings);
+					siteVO.setSiteDelivery(deliveryOpsTimings);
+					savedSite=populateOperationDetails(savedSite,siteVO);
+					savedSite = siteRepo.save(savedSite);
+					if(savedSite.getVersion()>0){
+						LOGGER.info("Site operation updated successfully");
+						siteVO.setStatus(200);
+					}
+			}	
+		}
+		catch(Exception e){
+			LOGGER.info("Exception while updating site information :");
+			e.printStackTrace();
+		}
+		LOGGER.info("Exit SiteServiceImpl - updateSiteOperationTimings");
+		return siteVO;
+	}
+
+	
+	
+	
 	@Override
 	public SiteLicenceVO updateSiteLicense(Long siteId, SiteLicenceVO siteLicenseVO) throws Exception {
 		LOGGER.info("Inside SiteServiceImpl - updateSiteLicense");

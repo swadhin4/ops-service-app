@@ -9,6 +9,7 @@ import com.ops.app.vo.SiteDeliveryVO;
 import com.ops.app.vo.SiteInfoVO;
 import com.ops.app.vo.SiteLicenceVO;
 import com.ops.app.vo.SiteOperationVO;
+import com.ops.app.vo.SiteOpsTimingVO;
 import com.ops.app.vo.SiteSubmeterVO;
 
 
@@ -41,6 +42,8 @@ public interface SiteService {
 	public int deleteLicense(Long licenseId)throws Exception;
 
 	public SiteSubmeterVO addOrUpdateSubmeter(Long siteId, SiteSubmeterVO siteSubmeterVO) throws Exception;
+
+	public CreateSiteVO updateSiteOperationTimings(Long siteId, List<SiteOpsTimingVO> siteOperationVOList) throws Exception;
 
 	
 	

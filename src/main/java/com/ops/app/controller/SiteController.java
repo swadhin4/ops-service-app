@@ -3,8 +3,8 @@
  */
 package com.ops.app.controller;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,6 +26,7 @@ import com.ops.app.vo.SiteDeliveryVO;
 import com.ops.app.vo.SiteInfoVO;
 import com.ops.app.vo.SiteLicenceVO;
 import com.ops.app.vo.SiteOperationVO;
+import com.ops.app.vo.SiteOpsTimingVO;
 import com.ops.app.vo.SiteSubmeterVO;
 import com.ops.app.vo.UserVO;
 import com.ops.web.service.SiteService;
@@ -378,28 +378,30 @@ public class SiteController {
 		return responseEntity;
 	}
 
-	@RequestMapping(value = "/v1/selected/deliveryoperation/{siteId}", method = RequestMethod.GET, produces = "application/json")
-	public ResponseEntity<RestResponse> getSelectedSiteDeliveryOps(@PathVariable(value = "siteId") Long siteId) {
-		logger.info("Inside SiteController .. getSelectedSiteDeliveryOps");
+	@RequestMapping(value = "/v1/selected/updateoperation/{siteId}", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<RestResponse> updateSiteOperations(@PathVariable(value = "siteId") Long siteId, 
+		   @RequestBody List<SiteOpsTimingVO> siteOpsTimings) {
+		logger.info("Inside SiteController .. updateSiteOperations");
 		RestResponse response = new RestResponse();
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
-		List<SiteDeliveryVO> siteOperationVO = null;
 		try {
-			siteOperationVO = siteService.getSiteDeliveryVO(siteId);
-			if (!siteOperationVO.isEmpty()) {
-				response.setStatusCode(200);
-				response.setObject(siteOperationVO);
-				responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
-			} else {
-				response.setStatusCode(404);
-				responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+			System.out.println("siteOpsTimings "+  siteOpsTimings);
+			if(siteOpsTimings.size()>0){
+				CreateSiteVO siteVO = siteService.updateSiteOperationTimings(siteId, siteOpsTimings);
+				if(siteVO.getStatus()==200){
+					response.setStatusCode(200);
+					response.setMessage("Site Operation details updated successfuly ");
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+				}else{
+					response.setMessage("Unable to update operation timings. ");
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.EXPECTATION_FAILED);
+				}
 			}
-
 		} catch (Exception e) {
-			logger.info("Exception while getting site delivery Operation details for " + siteId, e);
-			response.setMessage("Exception while getting site delivery Operation details for " + siteId);
+			logger.info("Exception while updating Operation details for " + siteId, e);
+			response.setMessage("Exception while updating Operation details for " + siteId);
 			response.setStatusCode(500);
-			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
