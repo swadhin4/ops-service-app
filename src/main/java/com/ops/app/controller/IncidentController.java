@@ -13,8 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -44,6 +42,7 @@ import com.ops.jpa.entities.TicketCategory;
 import com.ops.jpa.entities.User;
 import com.ops.jpa.repository.SPEscalationLevelRepo;
 import com.ops.jpa.repository.TicketAttachmentRepo;
+import com.ops.web.service.EmailService;
 import com.ops.web.service.ServiceProviderService;
 import com.ops.web.service.StatusService;
 import com.ops.web.service.TicketCategoryService;
@@ -81,6 +80,9 @@ public class IncidentController  {
 	
 	@Autowired
 	private ServiceProviderService serviceProviderService;
+	
+	@Autowired
+	private EmailService emailService;
 	
 
 	@RequestMapping(value = "/v1/list", method = RequestMethod.GET,produces="application/json")
@@ -607,7 +609,7 @@ public class IncidentController  {
 				responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 			
-			/*if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
+			if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
 				try {
 					  emailService.successTicketCreationSPEmail(savedTicketVO, "CREATED", loginUser.getCompany().getCompanyName());
 				 } catch (Exception e) {
@@ -615,7 +617,7 @@ public class IncidentController  {
 				}
 
 
-			}*//*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+			}/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
 
 			}
 			/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){

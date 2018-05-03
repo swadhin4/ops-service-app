@@ -3,7 +3,6 @@
  */
 package com.ops.app.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -86,8 +85,9 @@ public class SiteController {
 		return responseEntity;
 	}
 
-	@RequestMapping(value = "/v1/contact/update", method = RequestMethod.POST, produces = "application/json")
-	public ResponseEntity<RestResponse> updateSiteContact(@RequestBody final CreateSiteVO createSiteVO) {
+	@RequestMapping(value = "/v1/contact/update/{siteId}", method = RequestMethod.POST, produces = "application/json")
+	public ResponseEntity<RestResponse> updateSiteContact(@PathVariable(value="siteId") Long siteId,
+			@RequestBody final CreateSiteVO createSiteVO) {
 		logger.info("Inside SiteController .. updateSiteContact");
 		RestResponse response = new RestResponse();
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);

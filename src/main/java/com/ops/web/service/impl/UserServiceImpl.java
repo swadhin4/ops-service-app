@@ -455,6 +455,7 @@ public class UserServiceImpl implements UserService {
 			userVO.setCompany(user.getCompany());
 			userVO.setEnabled(user.getEnabled());
 			userVO.setPhoneNo(String.valueOf(user.getPhone()));
+			userVO.setSystemPassword(user.getSysPassword());
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy");
 			userVO.setCreatedAt(simpleDateFormat.format(user.getCreatedAt()));
 			List<UserRole> userRoles = user.getUserRoles();

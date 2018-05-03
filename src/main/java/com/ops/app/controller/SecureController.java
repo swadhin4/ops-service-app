@@ -46,10 +46,14 @@ public class SecureController {
 		if(StringUtils.isNotBlank(email)){
 			try {
 				UserVO user = userService.findUserByUsername(email);
-				if(user.getUserId()!=null){
+				if(user.getUserId()!=null && user.getSystemPassword().equalsIgnoreCase("NO")){
 					response.setStatusCode(200);
 					response.setObject(user);
 					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+				}else{
+					response.setStatusCode(401);
+					response.setMessage("Your current password is a system generated password. Please change your password by logging into web version of OPS365.");
+					responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_IMPLEMENTED);
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

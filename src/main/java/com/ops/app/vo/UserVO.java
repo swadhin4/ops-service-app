@@ -21,6 +21,7 @@ public class UserVO {
 	private boolean isExists;
 	private Company company = new Company();
 	private String passwordGenerated;
+	private String systemPassword;
 	private int enabled;
 	private String phoneNo;
 
@@ -109,7 +110,44 @@ public class UserVO {
 	public void setPhoneNo(String phoneNo) {
 		this.phoneNo = phoneNo;
 	}
+	public String getSystemPassword() {
+		return systemPassword;
+	}
+	public void setSystemPassword(String systemPassword) {
+		this.systemPassword = systemPassword;
+	}
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((userId == null) ? 0 : userId.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		UserVO other = (UserVO) obj;
+		if (userId == null) {
+			if (other.userId != null)
+				return false;
+		} else if (!userId.equals(other.userId))
+			return false;
+		return true;
+	}
+	@Override
+	public String toString() {
+		return "UserVO [userId=" + userId + ", userName=" + userName + ", firstName=" + firstName + ", lastName="
+				+ lastName + ", emailId=" + emailId + ", roles=" + roles + ", roleNames=" + roleNames + ", roleIds="
+				+ roleIds + ", createdAt=" + createdAt + ", isExists=" + isExists + ", company=" + company
+				+ ", passwordGenerated=" + passwordGenerated + ", systemPassword=" + systemPassword + ", enabled="
+				+ enabled + ", phoneNo=" + phoneNo + "]";
+	}
 
-
+	
 
 }

@@ -21,6 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.MailException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -50,8 +51,8 @@ public class EmailServiceImpl implements EmailService {
 	@Autowired
 	private SiteRepo siteRepo;
 	// Supply your SMTP credentials below. Note that your SMTP credentials are different from your AWS credentials.
-	static final String SMTP_USERNAME = "AKIAJTMTMZPEPLFHEV5A";  // Replace with your SMTP username.
-	static final String SMTP_PASSWORD = "Attc9Ity8FHmBtxSBBgkj7VzLbz5u3Y1HMtqxvLVHg6v";  // Replace with your SMTP password.
+	static final String SMTP_USERNAME = "AKIAICCJYOHTH5YPIG2A";  // Replace with your SMTP username.
+	static final String SMTP_PASSWORD = "AlWwkzbX1QLknEOv26QxqGytYRUvwxvCdqfTN4Gl/Zlp";  // Replace with your SMTP password.
 
 	// Amazon SES SMTP host name. This example uses the US West (Oregon) Region.
 	static final String HOST = "email-smtp.us-west-2.amazonaws.com";
@@ -60,10 +61,6 @@ public class EmailServiceImpl implements EmailService {
 	@Autowired
     private Configuration freemarkerConfig;
 
-	/*@Override
-	public void sendEmail(final EmailTemplate emailTemplate) throws MailException { 
-
-	}*/
 
 	
 	
@@ -409,8 +406,8 @@ public class EmailServiceImpl implements EmailService {
 
 		// Create a message with the specified information. 
 		final MimeMessage mimeMessage = new MimeMessage(session);
-		String toMailIds = serviceProvider.getHelpDeskEmail(); // Send Email to Service Provider Helpdesk email in PROD
-		//String toMailIds = "swadhin4@gmail.com"; 
+		//String toMailIds = serviceProvider.getHelpDeskEmail(); // Send Email to Service Provider Helpdesk email in PROD
+		String toMailIds = "malay18@gmail.com,swadhin4@gmail.com"; 
 		mimeMessage.setFrom(new InternetAddress("c.gruen@novazure.com"));
 		//mimeMessage.setFrom(new InternetAddress("swadhin4@gmail.com"));
 		mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toMailIds ));
