@@ -566,9 +566,7 @@ public class IncidentController  {
 		logger.info("Inside IncidentController .. createNewIncident");
 		RestResponse response = new RestResponse();
 		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
-		
 		TicketVO savedTicketVO = null;
-		RestResponse emailResponse =null;
 		User user = userService.findByEmail(ticketVO.getCreatedBy());
 		if(user!=null){
 			LoginUser loginUser = new LoginUser();
@@ -611,6 +609,7 @@ public class IncidentController  {
 			
 			if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
 				try {
+					  savedTicketVO.setCreatedUser(user.getFirstName() +" "+ user.getLastName());
 					  emailService.successTicketCreationSPEmail(savedTicketVO, "CREATED", loginUser.getCompany().getCompanyName());
 				 } catch (Exception e) {
 					 logger.info("Exception in sending incident creation mail", e);

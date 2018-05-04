@@ -406,8 +406,8 @@ public class EmailServiceImpl implements EmailService {
 
 		// Create a message with the specified information. 
 		final MimeMessage mimeMessage = new MimeMessage(session);
-		//String toMailIds = serviceProvider.getHelpDeskEmail(); // Send Email to Service Provider Helpdesk email in PROD
-		String toMailIds = "malay18@gmail.com,swadhin4@gmail.com"; 
+		String toMailIds = serviceProvider.getHelpDeskEmail(); // Send Email to Service Provider Helpdesk email in PROD
+		//String toMailIds = "malay18@gmail.com,swadhin4@gmail.com"; 
 		mimeMessage.setFrom(new InternetAddress("c.gruen@novazure.com"));
 		//mimeMessage.setFrom(new InternetAddress("swadhin4@gmail.com"));
 		mimeMessage.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toMailIds ));
