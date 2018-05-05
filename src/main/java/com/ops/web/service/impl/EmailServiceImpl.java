@@ -453,7 +453,7 @@ public class EmailServiceImpl implements EmailService {
 			model.put("company", company==null?"":company);
 	        model.put("serviceProvider", serviceProvider.getName()==null?"":serviceProvider.getName());
 	        model.put("siteName", savedticketVO.getSiteName()==null?"":savedticketVO.getSiteName());
-	        model.put("siteOwner", site.getSiteOwner()==null?"":site.getSiteOwner());
+	        model.put("siteOwner", site.getOperator().getCompanyName()==null?"":site.getOperator().getCompanyName());
 	        model.put("siteIdNumber1", site.getSiteNumberOne()==null?"":site.getSiteNumberOne().toString());
 	        model.put("siteIdNumber2", site.getSiteNumberTwo()==null?"":site.getSiteNumberTwo().toString());
 	        model.put("siteContactName", site.getAreaManagerName()==null?"":site.getAreaManagerName());
@@ -654,7 +654,7 @@ public class EmailServiceImpl implements EmailService {
 
 		// Create a message with the specified information. 
 		final MimeMessage mimeMessage = new MimeMessage(session);
-		String toMailIds =spEscalationLevel.getEscalationEmail(); // Send Email to Service Provider Helpdesk email in PROD
+		String toMailIds =spEscalationLevel.getEscalationEmail(); 
 		//String toMailIds = "swadhin4@gmail.com"; 
 		mimeMessage.setFrom(new InternetAddress("c.gruen@novazure.com"));
 		//mimeMessage.setFrom(new InternetAddress("swadhin4@gmail.com"));

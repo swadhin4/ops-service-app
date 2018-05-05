@@ -36,6 +36,7 @@ import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
 import com.ops.app.vo.UserVO;
 import com.ops.jpa.entities.CustomerSPLinkedTicket;
+import com.ops.jpa.entities.SPEscalationLevels;
 import com.ops.jpa.entities.Status;
 import com.ops.jpa.entities.TicketAttachment;
 import com.ops.jpa.entities.TicketCategory;
@@ -520,15 +521,37 @@ public class IncidentController  {
 			logger.info("Exception while escalations", e);
 		}
 		if(response.getStatusCode() == 200){
-		/*	List<String> escCCMailList = new ArrayList<String>(0);
+			List<String> escCCMailList = new ArrayList<String>(0);
 			SPEscalationLevels spEscalationLevel = null;
-			List<EscalationLevelVO> escalationLevelVOs = ticketEscalationLevels.getTicketData().getEscalationLevelList();
+			try{
+			TicketVO selectedTicketVO = ticketService.getSelectedTicket(savedTicketEscalation.getTicketId());
+			ServiceProviderVO serviceProviderVO = serviceProviderService.findServiceProvider(selectedTicketVO.getAssignedTo());
+			if(StringUtils.isNotBlank(serviceProviderVO.getHelpDeskEmail())){
+				selectedTicketVO.setAssignedSPEmail(serviceProviderVO.getHelpDeskEmail());
+			}
+			List<EscalationLevelVO> escalationLevelVOs = serviceProviderVO.getEscalationLevelList();
+			/*if(escalationLevelVOs.isEmpty()){
+				
+			}else{
+				List<EscalationLevelVO> finalEscalationList = new ArrayList<EscalationLevelVO>();
+				for(EscalationLevelVO escalationVO:escalationLevelVOs){
+					TicketEscalationVO ticketEscalationVO = ticketService.getEscalationStatus(selectedTicketVO.getTicketId(), escalationVO.getEscId());
+					EscalationLevelVO tempEscalationVO = new EscalationLevelVO();
+					if(ticketEscalationVO.getCustEscId()!=null){
+						
+					}
+				}
+				
+			}*/
+			
+			//List<EscalationLevelVO> escalationLevelVOs = ticketEscalationLevels.getTicketData().getEscalationLevelList();
 			
 			if(escalationLevelVOs.size()==0){
 				logger.info("No escalation list available");
 			}else{
 				logger.info("Escalation Level list : "+  escalationLevelVOs.size());
 				spEscalationLevel = spEscalationRepo.findOne(savedTicketEscalation.getEscId());
+				
 				for(EscalationLevelVO escLevelVO: escalationLevelVOs){
 					if(StringUtils.isNotBlank(escLevelVO.getStatus())){
 						escCCMailList.add(escLevelVO.getEscalationEmail());
@@ -537,24 +560,24 @@ public class IncidentController  {
 				logger.info("escCCMailList :" + escCCMailList);
 			}
 			
-			if(spEscalationLevel!=null){
-				String ccEscList= "";
-				if(!escCCMailList.isEmpty()){	
-					ccEscList= StringUtils.join(escCCMailList, ',');
-					logger.info("Escalation To List : "+  spEscalationLevel.getEscalationEmail());
-					logger.info("Escalation CC List : "+  ccEscList);
-					
-				}
-				try {
-					//emailService.successEscalationLevel(ticketEscalationLevels.getTicketData(), spEscalationLevel, ccEscList, savedTicketEscalation.getEscLevelDesc());
+				if(spEscalationLevel!=null){
+					String ccEscList= "";
+					if(!escCCMailList.isEmpty()){	
+						ccEscList= StringUtils.join(escCCMailList, ',');
+						logger.info("Escalation To List : "+  spEscalationLevel.getEscalationEmail());
+						logger.info("Escalation CC List : "+  ccEscList);
+						emailService.successEscalationLevel(selectedTicketVO, spEscalationLevel, ccEscList, savedTicketEscalation.getEscLevelDesc());
+					}else{
+						emailService.successEscalationLevel(selectedTicketVO, spEscalationLevel, ccEscList, savedTicketEscalation.getEscLevelDesc());
+					}
+				}	
 				} catch (Exception e) {
 					logger.info("Exception while sending email", e);
 				}
 				
 			}else{
 				logger.info("No ticket escalated for SP");
-			}*/
-		}
+			}
 		
 		logger.info("Exit IncidentController .. escalate");
 		return responseEntity;
