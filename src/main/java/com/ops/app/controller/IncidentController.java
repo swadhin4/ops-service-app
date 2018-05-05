@@ -551,9 +551,9 @@ public class IncidentController  {
 			}else{
 				logger.info("Escalation Level list : "+  escalationLevelVOs.size());
 				spEscalationLevel = spEscalationRepo.findOne(savedTicketEscalation.getEscId());
-				
 				for(EscalationLevelVO escLevelVO: escalationLevelVOs){
-					if(StringUtils.isNotBlank(escLevelVO.getStatus())){
+					TicketEscalationVO ticketEscalationVO = ticketService.getEscalationStatus(selectedTicketVO.getTicketId(), escLevelVO.getEscId());
+					if(StringUtils.isNotBlank(ticketEscalationVO.getEscalationStatus())){
 						escCCMailList.add(escLevelVO.getEscalationEmail());
 					}
 				}
