@@ -554,7 +554,9 @@ public class IncidentController  {
 				for(EscalationLevelVO escLevelVO: escalationLevelVOs){
 					TicketEscalationVO ticketEscalationVO = ticketService.getEscalationStatus(selectedTicketVO.getTicketId(), escLevelVO.getEscId());
 					if(StringUtils.isNotBlank(ticketEscalationVO.getEscalationStatus())){
-						escCCMailList.add(escLevelVO.getEscalationEmail());
+						if(!escLevelVO.getEscalationEmail().equalsIgnoreCase(spEscalationLevel.getEscalationEmail())){
+							escCCMailList.add(escLevelVO.getEscalationEmail());
+						}
 					}
 				}
 				logger.info("escCCMailList :" + escCCMailList);
