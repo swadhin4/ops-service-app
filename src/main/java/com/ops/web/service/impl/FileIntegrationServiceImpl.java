@@ -190,7 +190,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 			String generatedFileName="";
 				//String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
 				base64Image = attachment.getBase64ImageString().split(",")[1];
-				generatedFileName=attachment.getFile()+"_"+Calendar.getInstance().getTimeInMillis()+"."+attachment.getFileExtension().toLowerCase();
+				generatedFileName=customerTicketVO.getTicketNumber()+"_"+Calendar.getInstance().getTimeInMillis()+".jpg";
 				destinationFile = Paths.get(folderLocation+"\\"+generatedFileName);
 				fileKey=company.getCompanyCode()+"/incident/"+customerTicketVO.getTicketNumber()+"/"+generatedFileName;
 			if(StringUtils.isEmpty(base64Image)){
