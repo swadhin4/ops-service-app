@@ -66,4 +66,6 @@ public interface TicketService {
 	
 	public List<IncidentVO> getUserTickets(LoginUser loginUser) throws Exception;
 
+	public String getTicketAttachmentKey(Long ticketAttachmentId) throws Exception;
+
 }

@@ -219,10 +219,11 @@ public class TicketServiceImpl implements TicketService {
 				customerTicketVO.setSla(slaDueDate);
 			}
 			customerTicketVO.setMessage("CREATED");
-			System.out.println(customerTicketVO.getIncidentImageList());
+			LOGGER.info("Total image size : " + customerTicketVO.getIncidentImageList().size());
 			String folderLocation = createIncidentFolder(customerTicketVO.getTicketNumber(), user, null);
 			if(StringUtils.isNotEmpty(folderLocation)){
 				if(!customerTicketVO.getIncidentImageList().isEmpty()){
+					LOGGER.info("Uploading Images to S3 ");
 					boolean isUploaded = uploadIncidentImages(customerTicketVO, user,null, folderLocation, user.getUsername());
 					customerTicketVO.setFileUploaded(isUploaded);
 				}
@@ -1067,5 +1068,17 @@ public class TicketServiceImpl implements TicketService {
 			incidentVOList.add(incidentVO);
 		}		
 		return incidentVOList==null?Collections.emptyList():incidentVOList;
+	}
+	
+	@Override
+	public String getTicketAttachmentKey(Long ticketAttachmentId) throws Exception {
+		String ejbQl = QueryConstants.INCIDENT_FILE_KEY_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl);
+		q.setParameter("incidentfileid", ticketAttachmentId);
+		Object attachmentKey =  q.getSingleResult();
+		if(attachmentKey!=null){
+			return attachmentKey.toString();
+		}
+		return null;
 	}
 }

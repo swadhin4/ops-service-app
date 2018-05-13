@@ -21,17 +21,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
-import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.S3ClientOptions;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
 import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.ops.app.util.ApplicationUtil;
 import com.ops.app.util.RestResponse;
 import com.ops.app.vo.AssetVO;
 import com.ops.app.vo.CreateSiteVO;
@@ -80,7 +77,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		LOGGER.info("Insdie FileIntegrationServiceImpl .. siteFileUpload");
 		String base64Image = siteFile.getBase64ImageString().split(",")[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
-		String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+		String fileUploadLocation = environment.getProperty("file.upload.location");
 		Site site=null;
 		String generatedFileName="";
 		Path destinationFile =null;
@@ -121,10 +118,10 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 
 
 	private void pushToAwsS3(Path destinationFile, String fileKey) {
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
-		@SuppressWarnings("deprecation")
-		AmazonS3 s3client = new AmazonS3Client(credentials);
-		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
+		BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ", "YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
+		AmazonS3 s3client = AmazonS3ClientBuilder.standard()
+		                        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+		                        .build();
 		String bucketName="malay-first-s3-bucket-pms-test";
 		try{
 			awsIntegrationService.uploadObject(new PutObjectRequest(bucketName, fileKey, destinationFile.toFile()).withCannedAcl(CannedAccessControlList.Private), s3client);
@@ -140,7 +137,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		LOGGER.info("Inside FileIntegrationServiceImpl .. siteLicenseFileUpload");
 			String base64Image = licenseFile.getBase64ImageString().split(",")[1];
 			byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
-			String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+			String fileUploadLocation = environment.getProperty("file.upload.location");
 			SiteLicence license = null;
 			if(licenseFile.getLicenseId()!=null){
 				license = licenseRepo.findOne(licenseFile.getLicenseId());
@@ -159,7 +156,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 					generatedFileName = licenseName+"_"+Calendar.getInstance().getTimeInMillis()+"."+licenseFile.getFileExtension().toLowerCase();
 					destinationFile = Paths.get(fileUploadLocation+"\\"+company.getCompanyCode()+"\\site\\license\\"+generatedFileName);
 					fileKey=company.getCompanyCode()+"/site/license/"+generatedFileName;
-				//}
+				//}\
 			}else{
 				licenseName=licenseName.replaceAll(" ", "_").toLowerCase();
 				generatedFileName = licenseName+"_"+Calendar.getInstance().getTimeInMillis()+"."+licenseFile.getFileExtension().toLowerCase();
@@ -232,7 +229,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		LOGGER.info("Inside FileIntegrationServiceImpl .. siteAssetFileUpload");
 		String base64Image = assetFile.getBase64ImageString().split(",")[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
-		String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+		String fileUploadLocation = environment.getProperty("file.upload.location");
 		Asset asset=null;
 		String generatedFileName="";
 		Path destinationFile =null;
@@ -301,8 +298,8 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		File file = null;
 		if (org.apache.commons.lang3.StringUtils.isNotBlank(keyName)) {
 			try{
-			String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
-			String fileDownloadLocation = ApplicationUtil.getServerDownloadLocation();
+		    String fileUploadLocation = environment.getProperty("file.upload.location");
+			String fileDownloadLocation = environment.getProperty("file.download.location");
 			file = new File(fileUploadLocation+"/"+keyName);
 			if(file.exists()){
 				 File downloadDirectory = new File(fileDownloadLocation+"\\"+keyName);
@@ -389,8 +386,8 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		if(siteId!=null){
 			Site site = siteRepo.findOne(siteId);
 			LOGGER.info("Deleting attachment for Site : "+site.getSiteName());
-			String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
-			String fileDownloadLocation = ApplicationUtil.getServerDownloadLocation();
+			String fileUploadLocation = environment.getProperty("file.upload.location");
+			String fileDownloadLocation = environment.getProperty("file.download.location");
 			boolean isFileDeleted=false;
 			if(StringUtils.isNotBlank(site.getAttachmentPath())){
 			File uploadDirectory = new File(fileUploadLocation +"\\"+site.getAttachmentPath());
@@ -435,7 +432,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 					SiteLicence tempLicense = license;
 					keys.add(new KeyVersion(tempLicense.getAttachmentPath()));
 				}
-				String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+				String fileUploadLocation = environment.getProperty("file.upload.location");
 				File uploadDirectory = new File(fileUploadLocation +"\\"+siteLicenseList.get(0).getAttachmentPath());
 				if(uploadDirectory.exists()){
 					if(uploadDirectory.delete()){
@@ -472,8 +469,8 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 			if(StringUtils.isNotBlank(assetType) && assetType.equalsIgnoreCase("IMG")){
 				boolean isImgFileDeleted=false;
 				if(asset.getImagePath()!=null){
-					String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
-					String fileDownloadLocation = ApplicationUtil.getServerDownloadLocation();
+					String fileUploadLocation = environment.getProperty("file.upload.location");
+					String fileDownloadLocation = environment.getProperty("file.download.location");
 					File uploadDirectory = new File(fileUploadLocation +"\\"+asset.getImagePath());
 					File downloadDirectory = new File(fileDownloadLocation +"\\"+asset.getImagePath());
 					if(uploadDirectory.exists()){
@@ -511,7 +508,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 				if(asset.getDocumentPath()!=null){
 					boolean isDocFileDeleted=false;
 					LOGGER.info("Deleting attachment document for asset  : "+asset.getAssetName());
-					String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+					String fileUploadLocation = environment.getProperty("file.upload.location");
 					File uploadDirectory = new File(fileUploadLocation +"\\"+asset.getDocumentPath());
 					if(uploadDirectory.exists()){
 						if(uploadDirectory.delete()){
@@ -555,7 +552,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 					keys.add(new KeyVersion(tempAttachment.getAttachmentPath()));
 					//ticketAttachmentRepo.delete(tempAttachment.getAttachmentId());
 				}
-				String fileUploadLocation = ApplicationUtil.getServerUploadLocation();
+				String fileUploadLocation = environment.getProperty("file.upload.location");
 				File uploadDirectory = new File(fileUploadLocation +"\\"+ticketAttachmentList.get(0).getAttachmentPath());
 				if(uploadDirectory.exists()){
 					if(uploadDirectory.delete()){

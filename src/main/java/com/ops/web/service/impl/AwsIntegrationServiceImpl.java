@@ -31,7 +31,6 @@ import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
-import com.ops.app.util.ApplicationUtil;
 import com.ops.app.util.RestResponse;
 import com.ops.web.service.AwsIntegrationService;
 
@@ -76,7 +75,7 @@ public class AwsIntegrationServiceImpl implements AwsIntegrationService{
 
 	@Override
 	public File downloadFile(String bucketName, String keyName) {
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAICD42CCYTOXBJDOA","fwKFXHtteCVnKt3bxaj6muPNs55ZlI3BvKw70Zp/");
+		AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
 		AmazonS3 s3client = new AmazonS3Client(credentials);
 		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
 		byte[] readBuf = new byte[1024];
@@ -111,7 +110,7 @@ public class AwsIntegrationServiceImpl implements AwsIntegrationService{
 
 	@Override
 	public RestResponse deleteFile(String bucketName, String keyName) throws Exception {
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAICD42CCYTOXBJDOA","fwKFXHtteCVnKt3bxaj6muPNs55ZlI3BvKw70Zp/");
+		AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
 		AmazonS3 s3client = new AmazonS3Client(credentials);
 		RestResponse response = new RestResponse();
 		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
@@ -137,7 +136,7 @@ public class AwsIntegrationServiceImpl implements AwsIntegrationService{
 	@Override
 	public RestResponse deleteMultipleFile(List<KeyVersion> keys) throws Exception {
 		RestResponse response = new RestResponse();
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAICD42CCYTOXBJDOA","fwKFXHtteCVnKt3bxaj6muPNs55ZlI3BvKw70Zp/");
+		AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
 		AmazonS3 s3client = new AmazonS3Client(credentials);
 		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
 		DeleteObjectsRequest multiObjectDeleteRequest = new DeleteObjectsRequest("malay-first-s3-bucket-pms-test");

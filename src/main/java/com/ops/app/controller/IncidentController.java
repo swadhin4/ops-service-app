@@ -3,12 +3,19 @@
  */
 package com.ops.app.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +51,7 @@ import com.ops.jpa.entities.User;
 import com.ops.jpa.repository.SPEscalationLevelRepo;
 import com.ops.jpa.repository.TicketAttachmentRepo;
 import com.ops.web.service.EmailService;
+import com.ops.web.service.FileIntegrationService;
 import com.ops.web.service.ServiceProviderService;
 import com.ops.web.service.StatusService;
 import com.ops.web.service.TicketCategoryService;
@@ -81,6 +89,9 @@ public class IncidentController  {
 	
 	@Autowired
 	private ServiceProviderService serviceProviderService;
+	
+	@Autowired
+	private FileIntegrationService fileIntegrationService;
 	
 	@Autowired
 	private EmailService emailService;
@@ -662,4 +673,60 @@ public class IncidentController  {
 		return responseEntity;
 	}
 	
+	@RequestMapping(value = "/v1/selected/file/download/{incidentfileId}", method = RequestMethod.GET, produces="application/json")
+	public ResponseEntity<RestResponse> getSelectedIncidentImage(@PathVariable(value="incidentfileId") Long incidentfileId,
+			@RequestParam("email") String email) {
+		logger.info("Inside IncidentController .. getSelectedIncidentImage");
+		RestResponse response=new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+			try {
+				if(incidentfileId!=null){
+				User user = userService.findByEmail(email);
+				if(user!=null){
+					LoginUser loginUser = new LoginUser();
+					loginUser.setUserId(user.getUserId());
+					loginUser.setUsername(user.getEmailId());
+					loginUser.setCompany(user.getCompany());
+					String keyName = ticketService.getTicketAttachmentKey(incidentfileId);
+					RestResponse responseData = fileIntegrationService.getFileLocation(loginUser.getCompany(),keyName);
+					if(responseData.getStatusCode()==200){
+						String base64String = encodeFileToBase64Binary(responseData.getMessage());
+						if(!StringUtils.isEmpty(base64String)){
+							response.setStatusCode(200);
+							response.setMessage(base64String);
+							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
+						}else{
+							response.setStatusCode(500);
+							response.setMessage("No Image file");
+							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
+						}
+					}else{
+						logger.info("Unable to download file");
+					 }
+				  }
+				}
+			} catch (Exception e) {
+				logger.info("Exception while getting site image", e);
+
+			}
+
+		logger.info("Exit IncidentController .. getSelectedSiteFile");
+		return responseEntity;
+	}
+	
+	 private static String encodeFileToBase64Binary(String filePath){
+         String encodedfile = null;
+         try {
+        	 File file=new File(filePath);
+        	 byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(file));
+             encodedfile = new String(encoded, StandardCharsets.US_ASCII);
+         } catch (FileNotFoundException e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+         } catch (IOException e) {
+             // TODO Auto-generated catch block
+             e.printStackTrace();
+         }
+         return encodedfile;
+     }
 }
