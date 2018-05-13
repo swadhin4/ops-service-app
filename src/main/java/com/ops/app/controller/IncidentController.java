@@ -260,6 +260,8 @@ public class IncidentController  {
 						}
 						ticketMVO.setAttachments(fileAttachmentList);
 						response.setObject(ticketMVO);
+						response.setStatusCode(200);
+						responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
 				}
 			}
 		} catch (Exception e) {
