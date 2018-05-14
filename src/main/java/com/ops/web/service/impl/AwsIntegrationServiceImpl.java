@@ -17,10 +17,12 @@ import org.springframework.stereotype.Service;
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest;
 import com.amazonaws.services.s3.model.DeleteObjectsRequest.KeyVersion;
@@ -28,6 +30,7 @@ import com.amazonaws.services.s3.model.DeleteObjectsResult;
 import com.amazonaws.services.s3.model.MultiObjectDeleteException;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.Region;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -75,9 +78,17 @@ public class AwsIntegrationServiceImpl implements AwsIntegrationService{
 
 	@Override
 	public File downloadFile(String bucketName, String keyName) {
-		AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
+		/*AWSCredentials credentials = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ","YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
 		AmazonS3 s3client = new AmazonS3Client(credentials);
-		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));
+		s3client.setRegion(com.amazonaws.regions.Region.getRegion(Regions.US_WEST_2));*/
+		
+		BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ", "YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
+		AmazonS3 s3client = AmazonS3ClientBuilder.standard()
+								.withRegion(Regions.US_WEST_2)
+		                        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
+		                        .build();
+		
+		
 		byte[] readBuf = new byte[1024];
 		String imageBytes ="";
 		File file=null;
