@@ -1,0 +1,12 @@
+<html>
+ 
+<head></head>
+ 
+<body>
+    <p>Dear Chris,</p>
+    <p>A request for free demo has been raised by the customer ${customer}. Request details are mentioned below:></p>
+    <p>${message}</p>
+    <p>${regards}</p>
+</body>
+ 
+</html>
