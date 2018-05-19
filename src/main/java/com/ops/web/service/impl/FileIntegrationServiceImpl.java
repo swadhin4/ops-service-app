@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.MimetypesFileTypeMap;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.FileUtils;
@@ -301,27 +302,36 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		    String fileUploadLocation = environment.getProperty("file.upload.location");
 			String fileDownloadLocation = environment.getProperty("file.download.location");
 			file = new File(fileUploadLocation+"/"+keyName);
+			String contentType="";
 			if(file.exists()){
 				 File downloadDirectory = new File(fileDownloadLocation+"\\"+keyName);
 				 copyFileUsingApacheCommonsIO(file, downloadDirectory);
 				 LOGGER.info("File copied to download location : "+ downloadDirectory.getPath());
+				 String windowsFilePath = downloadDirectory.getPath();
+				 String javaFilePath = windowsFilePath.replace("\\", "/"); 
+				 contentType= new MimetypesFileTypeMap().getContentType(downloadDirectory.getPath());
 					response.setStatusCode(200);
-					response.setMessage(downloadDirectory.getPath());
+					response.setMessage(javaFilePath);
+					response.setFileType(contentType);
 				 
 			}else{
 				 LOGGER.info("File not found in server, so connecting to AWS S3");
 			file = awsIntegrationService.downloadFile("malay-first-s3-bucket-pms-test", keyName);
 			if (file!=null){
-				if(file.exists()) {
+				if(file.exists()) { 
+					 String windowsFilePath = file.getPath();
+					 String javaFilePath = windowsFilePath.replace("\\", "/"); 
+					contentType= new MimetypesFileTypeMap().getContentType(file.getPath());
 					response.setStatusCode(200);
-					response.setMessage(file.getPath());
+					response.setMessage(javaFilePath);
+					response.setFileType(contentType);
 				}
 			}
 			else{
 				response.setStatusCode(404);
 				response.setMessage("File not found");
 			}
-			
+			 LOGGER.info("File Content Type : "+ contentType);
 			}
 			}catch(AmazonS3Exception e){
 				LOGGER.info("Key name"+ keyName +" does not exits.", e);
@@ -578,6 +588,8 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 							ticketAttachmentRepo.delete(tempAttachment.getAttachmentId());
 						}
 						response.setStatusCode(200);
+					}else{
+						response.setStatusCode(404);
 					}
 				}
 			}

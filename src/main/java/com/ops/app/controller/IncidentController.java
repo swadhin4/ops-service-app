@@ -20,6 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -95,6 +96,9 @@ public class IncidentController  {
 	
 	@Autowired
 	private EmailService emailService;
+	
+	 @Autowired
+	 private Environment environment;
 	
 
 	@RequestMapping(value = "/v1/list", method = RequestMethod.GET,produces="application/json")
@@ -692,10 +696,13 @@ public class IncidentController  {
 					String keyName = ticketService.getTicketAttachmentKey(incidentfileId);
 					RestResponse responseData = fileIntegrationService.getFileLocation(loginUser.getCompany(),keyName);
 					if(responseData.getStatusCode()==200){
-						String base64String = encodeFileToBase64Binary(responseData.getMessage());
+						logger.info("Converting To base64 string from file :"+ responseData.getMessage());
+						File file = new File(responseData.getMessage());
+						String base64String = encodeFileToBase64Binary(file);
 						if(!StringUtils.isEmpty(base64String)){
 							response.setStatusCode(200);
 							response.setMessage(base64String);
+							response.setFileType(responseData.getFileType());
 							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
 						}else{
 							response.setStatusCode(500);
@@ -716,12 +723,16 @@ public class IncidentController  {
 		return responseEntity;
 	}
 	
-	 private static String encodeFileToBase64Binary(String filePath){
-         String encodedfile = null;
+	 private static String encodeFileToBase64Binary(File downloadedFile){
+         String encodedfile = "";
          try {
-        	 File file=new File(filePath);
-        	 byte[] encoded = Base64.encodeBase64(FileUtils.readFileToByteArray(file));
-             encodedfile = new String(encoded, StandardCharsets.US_ASCII);
+        	// Reading a Image file from file system
+             FileInputStream imageInFile = new FileInputStream(downloadedFile);
+             byte imageData[] = new byte[(int) downloadedFile.length()];
+             imageInFile.read(imageData);
+             encodedfile = Base64.encodeBase64String(imageData);
+
+             imageInFile.close();
          } catch (FileNotFoundException e) {
              // TODO Auto-generated catch block
              e.printStackTrace();

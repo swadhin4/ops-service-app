@@ -21,6 +21,8 @@ public class RestResponse  {
 	private Object siteSalesOperations;
 	
 	private Object siteDeliveryOperations;
+	
+	private String fileType;
 
 
 
@@ -139,6 +141,18 @@ public class RestResponse  {
 
 	public void setSiteDeliveryOperations(Object siteDeliveryOperations) {
 		this.siteDeliveryOperations = siteDeliveryOperations;
+	}
+
+
+
+	public String getFileType() {
+		return fileType;
+	}
+
+
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
 	}
 
 
