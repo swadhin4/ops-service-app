@@ -31,6 +31,10 @@ public class QueryConstants {
 	public final static String INCIDENT_FILE_KEY_QUERY="select attachment_path from pm_cust_ticket_attachment"
 			+ " where id=:incidentfileid ";
 	
+	public final static String SELECT_SITE_ATTACHMENT_QUERY = "select site_id, site_name, attachment_path from pm_site where site_id=:siteId";
+	
+	public final static String UPDATE_SITE_ATTACHMENT_QUERY = "update Site s set s.attachmentPath=? where s.siteId=?";
+			
 	
 	
 }

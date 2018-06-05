@@ -11,6 +11,8 @@ import com.ops.app.vo.SiteLicenceVO;
 import com.ops.app.vo.SiteOperationVO;
 import com.ops.app.vo.SiteOpsTimingVO;
 import com.ops.app.vo.SiteSubmeterVO;
+import com.ops.app.vo.UploadFile;
+import com.ops.jpa.entities.Company;
 
 
 public interface SiteService {
@@ -45,6 +47,10 @@ public interface SiteService {
 
 	public CreateSiteVO updateSiteOperationTimings(Long siteId, List<SiteOpsTimingVO> siteOperationVOList) throws Exception;
 
+	public CreateSiteVO uploadSiteImage(Company company,UploadFile siteFile) throws Exception;
+
+	public boolean updateSiteAttachmentFile(String fileLocation, Long siteId) throws Exception;
 	
+	public String getSiteAttachment(Long siteId) throws Exception;
 	
 }

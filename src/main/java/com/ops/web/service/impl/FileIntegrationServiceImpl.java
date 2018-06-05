@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
 import com.amazonaws.auth.BasicAWSCredentials;
+import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
@@ -79,33 +80,33 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 		String base64Image = siteFile.getBase64ImageString().split(",")[1];
 		byte[] imageBytes = javax.xml.bind.DatatypeConverter.parseBase64Binary(base64Image);
 		String fileUploadLocation = environment.getProperty("file.upload.location");
-		Site site=null;
 		String generatedFileName="";
 		Path destinationFile =null;
 		String fileKey="";
-		String siteName=siteVO.getSiteName();
 		if(siteVO.getSiteId()!=null){
-			site=siteRepo.findOne(siteVO.getSiteId());
-		/*	if(StringUtils.isNotBlank(site.getAttachmentPath())){
-				generatedFileName=site.getAttachmentPath();
+			String siteName=siteVO.getSiteName();
+			//site=siteRepo.findOne(siteVO.getSiteId());
+			if(siteVO.getFileInput().equals("DB")){
+				generatedFileName=siteFile.getFileName();
 				fileKey=generatedFileName;
 				destinationFile = Paths.get(fileUploadLocation+"\\"+generatedFileName);
-			}else{*/
+			}else{
 				siteName = siteName.replaceAll(" ", "_").toLowerCase();
-				generatedFileName = siteName+"_"+Calendar.getInstance().getTimeInMillis()+"."+siteFile.getFileExtension().toLowerCase();
+				generatedFileName = siteName+"_"+Calendar.getInstance().getTimeInMillis()+".jpg";
 				destinationFile = Paths.get(fileUploadLocation+"\\"+company.getCompanyCode()+"\\site\\"+generatedFileName);
 				fileKey=company.getCompanyCode()+"/site/"+generatedFileName;
-			//}
-		}else{
-			generatedFileName = siteVO.getSiteName()+"_"+Calendar.getInstance().getTimeInMillis()+"."+siteFile.getFileExtension().toLowerCase();
+			}
+		}/*else{
+			generatedFileName = siteVO.getSiteName()+"_"+Calendar.getInstance().getTimeInMillis()+".jpg";
 			destinationFile = Paths.get(fileUploadLocation+"\\"+company.getCompanyCode()+"\\site\\"+generatedFileName);
 			fileKey=company.getCompanyCode()+"/site/"+generatedFileName;
-		}
+		}*/
 		
 		try {
 			Files.write(destinationFile, imageBytes);
 			LOGGER.info("Saving image to location : "+ destinationFile.toString() );
 			siteVO.setFileLocation(destinationFile.toString());
+			LOGGER.info("Pushing the image to AWSS3");
 			pushToAwsS3(destinationFile, fileKey);
 		
 		} catch (IOException e) {
@@ -121,6 +122,7 @@ public class FileIntegrationServiceImpl implements FileIntegrationService {
 	private void pushToAwsS3(Path destinationFile, String fileKey) {
 		BasicAWSCredentials awsCreds = new BasicAWSCredentials("AKIAJZTA6BYNTESWQWBQ", "YWzhoGSfC1ADDT+xHzvAsvf/wyMlSl71TexLLg8t");
 		AmazonS3 s3client = AmazonS3ClientBuilder.standard()
+								.withRegion(Regions.US_WEST_2)
 		                        .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
 		                        .build();
 		String bucketName="malay-first-s3-bucket-pms-test";

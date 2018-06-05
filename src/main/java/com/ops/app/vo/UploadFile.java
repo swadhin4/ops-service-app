@@ -7,7 +7,9 @@ public class UploadFile {
 	private String fileName;
 	private Long licenseId;
 	private Long siteId;
+	private String siteName;
 	private Long assetId;
+	private String assetName;
 	private Long ticketId;
 	private String file;
 	private Long imgPos;
@@ -76,6 +78,18 @@ public class UploadFile {
 	}
 	
 	
+	public String getSiteName() {
+		return siteName;
+	}
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}
+	public String getAssetName() {
+		return assetName;
+	}
+	public void setAssetName(String assetName) {
+		this.assetName = assetName;
+	}
 	@Override
 	public String toString() {
 		return "UploadFile [base64ImageString=" + base64ImageString + ", fileExtension=" + fileExtension + ", fileName="

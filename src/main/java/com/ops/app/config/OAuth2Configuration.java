@@ -41,7 +41,6 @@ public class OAuth2Configuration {
 
         @Override
         public void configure(HttpSecurity http) throws Exception {
-
             http
                     .exceptionHandling()
                     .authenticationEntryPoint(customAuthenticationEntryPoint)
@@ -61,6 +60,7 @@ public class OAuth2Configuration {
                     .authorizeRequests()
                     .antMatchers("/hello/").permitAll()
                     .antMatchers("/basic/token/").permitAll()
+                    .antMatchers("/test/**").authenticated()
                     .antMatchers("/asset/**").authenticated()
                     .antMatchers("/site/**").authenticated()
                     .antMatchers("/incident/**").authenticated()

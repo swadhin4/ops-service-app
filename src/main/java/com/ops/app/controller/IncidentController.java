@@ -3,24 +3,19 @@
  */
 package com.ops.app.controller;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -579,7 +574,40 @@ public class IncidentController  {
 				logger.info("escCCMailList :" + escCCMailList);
 			}
 			
-				if(spEscalationLevel!=null){
+			final SPEscalationLevels  spEscLevel = spEscalationLevel;
+			final TicketEscalationVO savedTicketEsc = savedTicketEscalation;
+			TaskExecutor theExecutor = new SimpleAsyncTaskExecutor();
+	        theExecutor.execute(new Runnable() {
+	            @Override
+	            public void run () {
+	                System.out.println("running task in thread: " +Thread.currentThread().getName());
+	                if(spEscLevel!=null){
+	                	String ccEscList= "";
+	    				if(!escCCMailList.isEmpty()){	
+	    					ccEscList= StringUtils.join(escCCMailList, ',');
+	    					logger.info("Escalation To List : "+  spEscLevel.getEscalationEmail());
+	    					logger.info("Escalation CC List : "+  ccEscList);
+	    					try {
+	    						emailService.successEscalationLevel(selectedTicketVO, spEscLevel, ccEscList, savedTicketEsc.getEscLevelDesc());
+	    					} catch (Exception e) {
+	    						logger.info("Exception while sending email", e);
+	    					}
+	    				}else{
+	    					try {
+	    						emailService.successEscalationLevel(selectedTicketVO, spEscLevel, ccEscList, savedTicketEsc.getEscLevelDesc());
+	    					} catch (Exception e) {
+	    						logger.info("Exception while sending email", e);
+	    					}
+	    				}
+	    				
+	    			}else{
+	    				logger.info("No ticket escalated for SP");
+	    			}
+	                
+	            }
+	        });
+			
+				/*if(spEscalationLevel!=null){
 					String ccEscList= "";
 					if(!escCCMailList.isEmpty()){	
 						ccEscList= StringUtils.join(escCCMailList, ',');
@@ -590,14 +618,15 @@ public class IncidentController  {
 						emailService.successEscalationLevel(selectedTicketVO, spEscalationLevel, ccEscList, savedTicketEscalation.getEscLevelDesc());
 					}
 				}	
-				} catch (Exception e) {
-					logger.info("Exception while sending email", e);
-				}
+				} 
 				
 			}else{
 				logger.info("No ticket escalated for SP");
+			}*/
+			}catch (Exception e) {
+				logger.info("Exception while sending email", e);
 			}
-		
+		}
 		logger.info("Exit IncidentController .. escalate");
 		return responseEntity;
 	}
@@ -650,6 +679,23 @@ public class IncidentController  {
 			}
 			
 			if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
+				final TicketVO ticketVOs = savedTicketVO;
+				TaskExecutor theExecutor = new SimpleAsyncTaskExecutor();
+		        theExecutor.execute(new Runnable() {
+		            @Override
+		            public void run () {
+		                System.out.println("running task in thread: " +Thread.currentThread().getName());
+		                try {
+							emailService.successTicketCreationSPEmail(ticketVOs, "CREATED", loginUser.getCompany().getCompanyName());
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+		            }
+		        });
+			}
+			
+			/*if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("CREATED")){
 				try {
 					  savedTicketVO.setCreatedUser(user.getFirstName() +" "+ user.getLastName());
 					  emailService.successTicketCreationSPEmail(savedTicketVO, "CREATED", loginUser.getCompany().getCompanyName());
@@ -658,7 +704,7 @@ public class IncidentController  {
 				}
 
 
-			}/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
+			}*//*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
 
 			}
 			/*else if(response.getStatusCode()==200 && savedTicketVO.getMessage().equalsIgnoreCase("UPDATED")){
@@ -679,67 +725,7 @@ public class IncidentController  {
 		return responseEntity;
 	}
 	
-	@RequestMapping(value = "/v1/selected/file/download/{incidentfileId}", method = RequestMethod.GET, produces="application/json")
-	public ResponseEntity<RestResponse> getSelectedIncidentImage(@PathVariable(value="incidentfileId") Long incidentfileId,
-			@RequestParam("email") String email) {
-		logger.info("Inside IncidentController .. getSelectedIncidentImage");
-		RestResponse response=new RestResponse();
-		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
-			try {
-				if(incidentfileId!=null){
-				User user = userService.findByEmail(email);
-				if(user!=null){
-					LoginUser loginUser = new LoginUser();
-					loginUser.setUserId(user.getUserId());
-					loginUser.setUsername(user.getEmailId());
-					loginUser.setCompany(user.getCompany());
-					String keyName = ticketService.getTicketAttachmentKey(incidentfileId);
-					RestResponse responseData = fileIntegrationService.getFileLocation(loginUser.getCompany(),keyName);
-					if(responseData.getStatusCode()==200){
-						logger.info("Converting To base64 string from file :"+ responseData.getMessage());
-						File file = new File(responseData.getMessage());
-						String base64String = encodeFileToBase64Binary(file);
-						if(!StringUtils.isEmpty(base64String)){
-							response.setStatusCode(200);
-							response.setMessage(base64String);
-							response.setFileType(responseData.getFileType());
-							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.OK);
-						}else{
-							response.setStatusCode(500);
-							response.setMessage("No Image file");
-							responseEntity = new ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND);
-						}
-					}else{
-						logger.info("Unable to download file");
-					 }
-				  }
-				}
-			} catch (Exception e) {
-				logger.info("Exception while getting site image", e);
-
-			}
-
-		logger.info("Exit IncidentController .. getSelectedSiteFile");
-		return responseEntity;
-	}
 	
-	 private static String encodeFileToBase64Binary(File downloadedFile){
-         String encodedfile = "";
-         try {
-        	// Reading a Image file from file system
-             FileInputStream imageInFile = new FileInputStream(downloadedFile);
-             byte imageData[] = new byte[(int) downloadedFile.length()];
-             imageInFile.read(imageData);
-             encodedfile = Base64.encodeBase64String(imageData);
 
-             imageInFile.close();
-         } catch (FileNotFoundException e) {
-             // TODO Auto-generated catch block
-             e.printStackTrace();
-         } catch (IOException e) {
-             // TODO Auto-generated catch block
-             e.printStackTrace();
-         }
-         return encodedfile;
-     }
+	
 }

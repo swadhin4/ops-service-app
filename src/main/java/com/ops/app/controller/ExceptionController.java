@@ -18,12 +18,12 @@ public class ExceptionController implements ErrorController {
     
     @RequestMapping(value = PATH)
     public String error() {
-    	LOGGER.info("Pre-authenticated entry point called. Rejecting access," + HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
+    	/*LOGGER.info("Pre-authenticated entry point called. Rejecting access," + HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
     	RestResponse responseData=new RestResponse();
     	responseData.setStatusCode(HttpStatus.PROXY_AUTHENTICATION_REQUIRED.ordinal());
         responseData.setMessage("Authentication Failed. This is a protected resource. It requires more authentication");
-        ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(responseData,HttpStatus.PROXY_AUTHENTICATION_REQUIRED);
-		return responseData.getMessage();
+        ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(responseData,HttpStatus.PROXY_AUTHENTICATION_REQUIRED);*/
+		return "Error";
     }
 
 	@Override

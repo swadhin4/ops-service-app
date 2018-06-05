@@ -13,6 +13,7 @@ import com.ops.app.vo.TicketHistoryVO;
 import com.ops.app.vo.TicketMVO;
 import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
+import com.ops.app.vo.UploadFile;
 import com.ops.jpa.entities.CustomerSPLinkedTicket;
 import com.ops.jpa.entities.CustomerTicket;
 
@@ -67,5 +68,9 @@ public interface TicketService {
 	public List<IncidentVO> getUserTickets(LoginUser loginUser) throws Exception;
 
 	public String getTicketAttachmentKey(Long ticketAttachmentId) throws Exception;
+	
+	public boolean uploadIncidentAttachments(Long ticketId, String incidentNumber, LoginUser user, List<UploadFile> incidentImageList) throws Exception;
+
+
 
 }

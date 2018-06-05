@@ -651,26 +651,65 @@ public class SiteServiceImpl implements SiteService{
 		
 		LOGGER.info("Exit SiteServiceImpl .. uploadSiteImageToAwsS3");
 	}
+	
+	
 
-	private CreateSiteVO uploadSiteImage(Company company,CreateSiteVO savedSiteVO, String fileInput, String fileExtension) {
+	@Override
+	public CreateSiteVO uploadSiteImage(Company company,UploadFile siteFile) throws Exception {
 		LOGGER.info("Inside SiteServiceImpl .. uploadSiteImage");
-		UploadFile uploadFile = new UploadFile();
-		uploadFile.setBase64ImageString(fileInput);
-		uploadFile.setFileExtension(fileExtension);
-		uploadFile.setFileName(savedSiteVO.getSiteName());
-		String fileLocation=null;
-		try {
-			fileLocation = fileIntegrationService.siteFileUpload(savedSiteVO, uploadFile, company);
-			savedSiteVO.setFileLocation(fileLocation);
-		} catch (IOException e) {
-			LOGGER.info("Error while uploading site image file", e);
+		String ejbQl = QueryConstants.SELECT_SITE_ATTACHMENT_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl);
+		q.setParameter("siteId", siteFile.getSiteId());
+		List<Object[]> siteAttachment =  q.getResultList();
+		CreateSiteVO siteVO = new CreateSiteVO();
+		if(siteAttachment!=null){
+			String siteInfo="";
+			for (Object[] result : siteAttachment) {
+				System.out.println(result[0].toString()+","+result[1].toString()+", "+result[2]);
+				siteVO.setSiteId(Long.parseLong(result[0].toString()));
+				siteVO.setSiteName(result[1].toString());
+				if(StringUtils.isEmpty(result[2])){
+					siteFile.setFileName(siteFile.getFileName());
+					siteVO.setFileInput("UI");
+				}else{
+					siteFile.setFileName(result[2].toString());
+					siteVO.setFileInput("DB");
+				}
+				
+			}
+			try {
+				String fileLocation = fileIntegrationService.siteFileUpload(siteVO, siteFile, company);
+				siteVO.setFileLocation(fileLocation);
+			} catch (IOException e) {
+				LOGGER.info("Error while uploading site image file", e);
+			}
 		}
+		
 		LOGGER.info("Exit SiteServiceImpl .. uploadSiteImage");
-		return savedSiteVO;
+		return siteVO;
 		
 	}
 
 	
+
+	@Override
+	@Transactional
+	public boolean updateSiteAttachmentFile(String fileLocation, Long siteId) throws Exception{
+		 try
+	        {
+			 String updateSiteAttachmentQuery = QueryConstants.UPDATE_SITE_ATTACHMENT_QUERY;
+			entityManager.createQuery(updateSiteAttachmentQuery)
+	            .setParameter(1, fileLocation)
+	            .setParameter(2, siteId)
+	            .executeUpdate();
+	            return true;
+	        }
+	        catch (Exception e)
+	        {
+	        	LOGGER.info("Error while updating site image file", e);
+	            return false;
+	        }
+	}
 
 	private CreateSiteVO validateObject(Site savedSite, CreateSiteVO siteVO) {
 		try {
@@ -730,20 +769,20 @@ public class SiteServiceImpl implements SiteService{
 				try {
 					RestResponse response = fileIntegrationService.deleteFile(site.getSiteId(), null, null, null, null);
 					if(response.getStatusCode() == 0){
-						siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput(), siteVO.getFileExtension());
+						//siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput());
 						//uploadSiteImageToAwsS3(savedSiteVO, siteVO.getFileInput(), siteVO.getFileExtension());
 						if(!StringUtils.isEmpty(siteVO.getFileLocation())){
 							site.setAttachmentPath(siteVO.getFileLocation());
 						}
 					}else if( response.getStatusCode()==200){
-						siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput(), siteVO.getFileExtension());
+						//siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput());
 						//uploadSiteImageToAwsS3(savedSiteVO, siteVO.getFileInput(), siteVO.getFileExtension());
 						if(!StringUtils.isEmpty(siteVO.getFileLocation())){
 							site.setAttachmentPath(siteVO.getFileLocation());
 						}
 					}
 					else if( response.getStatusCode()==500){
-						siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput(), siteVO.getFileExtension());
+					//	siteVO = uploadSiteImage(company,siteVO, siteVO.getFileInput());
 						//uploadSiteImageToAwsS3(savedSiteVO, siteVO.getFileInput(), siteVO.getFileExtension());
 						if(!StringUtils.isEmpty(siteVO.getFileLocation())){
 							site.setAttachmentPath(siteVO.getFileLocation());
@@ -1487,7 +1526,23 @@ public class SiteServiceImpl implements SiteService{
 		return isDeleted;
 	}
 
-	
-
-
+	@Override
+	public String getSiteAttachment(Long siteId) throws Exception {
+		LOGGER.info("Inside SiteServiceImpl .. uploadSiteImage");
+		String ejbQl = QueryConstants.SELECT_SITE_ATTACHMENT_QUERY;
+		Query q= entityManager.createNativeQuery(ejbQl);
+		q.setParameter("siteId", siteId);
+		List<Object[]> siteAttachment =  q.getResultList();
+		CreateSiteVO siteVO = new CreateSiteVO();
+		String attachment ="";
+		if(siteAttachment!=null){
+			for (Object[] result : siteAttachment) {
+				LOGGER.info(result[0].toString()+","+result[1].toString()+", "+result[2]);
+				if(!StringUtils.isEmpty(result[2])){
+					attachment = result[2].toString();
+				}
+	        }
+		}
+		return attachment;
+	}
 }

@@ -5,6 +5,7 @@ package com.ops.app.controller;
 
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,9 @@ import com.ops.app.vo.SiteLicenceVO;
 import com.ops.app.vo.SiteOperationVO;
 import com.ops.app.vo.SiteOpsTimingVO;
 import com.ops.app.vo.SiteSubmeterVO;
+import com.ops.app.vo.UploadFile;
 import com.ops.app.vo.UserVO;
+import com.ops.jpa.entities.User;
 import com.ops.web.service.SiteService;
 import com.ops.web.service.UserService;
 
@@ -430,7 +433,7 @@ public class SiteController {
 			logger.info("Exception while getting site delivery Operation details for " + siteId, e);
 			response.setMessage("Exception while getting site delivery Operation details for " + siteId);
 			response.setStatusCode(500);
-			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 
 		}
 
@@ -438,29 +441,34 @@ public class SiteController {
 		return responseEntity;
 	}
 
-	/*
-	 * @RequestMapping(value = "/selected/file/{keyname}", method =
-	 * RequestMethod.POST, produces = "application/json") public
-	 * ResponseEntity<RestResponse>
-	 * getSelectedSiteFile(@RequestParam(value="keyname") String keyname, final
-	 * HttpSession session) { logger.info(
-	 * "Inside SiteController .. getSelectedSiteFile"); RestResponse response =
-	 * new RestResponse(); ResponseEntity<RestResponse> responseEntity = new
-	 * ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT); LoginUser loginUser
-	 * = getCurrentLoggedinUser(session); if(loginUser!=null){ try { String
-	 * image= siteService.getSiteFiles("site/testupload_1511726509651.png");
-	 * if(StringUtils.isNotBlank(image)){ response.setStatusCode(200);
-	 * response.setObject(image); responseEntity = new
-	 * ResponseEntity<RestResponse>(response,HttpStatus.OK); }else{
-	 * response.setStatusCode(404); responseEntity = new
-	 * ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND); }
-	 * 
-	 * } catch (Exception e) { logger.info("Exception while getting site image",
-	 * e); response.setStatusCode(500); responseEntity = new
-	 * ResponseEntity<RestResponse>(response,HttpStatus.NOT_FOUND); } }
-	 * 
-	 * logger.info("Exit SiteController .. getSelectedSiteFile"); return
-	 * responseEntity; }
-	 */
+	
+	@RequestMapping(value = "/v1/selected/attachment/{siteId}", method = RequestMethod.GET, produces = "application/json")
+	public ResponseEntity<RestResponse> getSelectedSiteAttachment(@PathVariable(value = "siteId") Long siteId) {
+		logger.info("Inside SiteController .. getSelectedSiteAttachment");
+		RestResponse response = new RestResponse();
+		ResponseEntity<RestResponse> responseEntity = new ResponseEntity<RestResponse>(HttpStatus.NO_CONTENT);
+		try {
+			String attachmentPath = siteService.getSiteAttachment(siteId);
+			if (!attachmentPath.isEmpty()) {
+				response.setStatusCode(200);
+				response.setObject(attachmentPath);
+				responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.OK);
+			} else {
+				response.setStatusCode(404);
+				responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.NOT_FOUND);
+			}
+
+		} catch (Exception e) {
+			logger.info("Exception while getting site attachment details for " + siteId, e);
+			response.setMessage("Exception while getting site attachment details for " + siteId);
+			response.setStatusCode(500);
+			responseEntity = new ResponseEntity<RestResponse>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+
+		}
+
+		logger.info("Exit SiteController .. getSelectedSiteAttachment");
+		return responseEntity;
+	}
+
 
 }

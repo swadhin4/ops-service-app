@@ -33,6 +33,7 @@ import com.ops.app.vo.TicketHistoryVO;
 import com.ops.app.vo.TicketMVO;
 import com.ops.app.vo.TicketPrioritySLAVO;
 import com.ops.app.vo.TicketVO;
+import com.ops.app.vo.UploadFile;
 import com.ops.app.vo.UserIncidentVO;
 import com.ops.jpa.entities.Asset;
 import com.ops.jpa.entities.Company;
@@ -273,9 +274,9 @@ public class TicketServiceImpl implements TicketService {
 		LOGGER.info("Inside TicketServiceImpl .. createIncidentFolder");
 		String incidentFolderLocation="";
 		try {
-			if(spSiteCompany!=null){
+			/*if(spSiteCompany!=null){
 			 incidentFolderLocation = fileIntegrationService.createIncidentFolder(ticketNumber, spSiteCompany);
-			}
+			}*/
 			
 			if(user!=null){
 				incidentFolderLocation = fileIntegrationService.createIncidentFolder(ticketNumber, user.getCompany());
@@ -298,10 +299,10 @@ public class TicketServiceImpl implements TicketService {
 				fileIntegrationService.siteIncidentFileUpload(customerTicketVO.getIncidentImageList(), customerTicketVO, user.getCompany(), folderLocation, uploadedBy);
 				isUploaded = true;
 			}
-			if(company!=null){
+			/*if(company!=null){
 				fileIntegrationService.siteIncidentFileUpload(customerTicketVO.getIncidentImageList(), customerTicketVO, company, folderLocation, uploadedBy);
 				isUploaded = true;
-			}
+			}*/
 		} catch (IOException e) {
 			LOGGER.info("Exception while uploading to s3", e);
 			isUploaded =false;
@@ -1080,5 +1081,36 @@ public class TicketServiceImpl implements TicketService {
 			return attachmentKey.toString();
 		}
 		return null;
+	}
+	
+	@Override
+	public boolean uploadIncidentAttachments(Long ticketId, String incidentNumber, LoginUser user, List<UploadFile> incidentImageList) throws Exception {
+		LOGGER.info("Inside TicketServiceImpl .. uploadIncidentAttachments");
+		String folderLocation = createIncidentFolder(incidentNumber, user, null);
+		boolean isUploaded =false;
+		if(StringUtils.isNotEmpty(folderLocation)){
+			if(!incidentImageList.isEmpty()){
+				LOGGER.info("Uploading Images to S3 ");
+				try {
+					TicketVO customerTicketVO = new TicketVO();
+					customerTicketVO.setTicketId(ticketId);
+					customerTicketVO.setTicketNumber(incidentNumber);
+					if(user!=null){
+						fileIntegrationService.siteIncidentFileUpload(incidentImageList, customerTicketVO, user.getCompany(), folderLocation, user.getUsername());
+						isUploaded = true;
+					}
+					/*if(user.getCompany()!=null){
+						fileIntegrationService.siteIncidentFileUpload(incidentImageList, customerTicketVO, user.getCompany(), folderLocation, user.getEmail());
+						isUploaded = true;
+					}*/
+				} catch (IOException e) {
+					LOGGER.info("Exception while uploading to s3", e);
+					isUploaded =false;
+					
+				}
+			}
+		}
+		LOGGER.info("Inside TicketServiceImpl .. uploadIncidentAttachments");
+		return isUploaded;
 	}
 }
