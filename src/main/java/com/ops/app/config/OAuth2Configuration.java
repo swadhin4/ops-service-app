@@ -67,6 +67,7 @@ public class OAuth2Configuration {
                     .antMatchers("/serviceprovider/**").authenticated()
                     .antMatchers("/file/**").authenticated()
                     .antMatchers("/district/**").authenticated()
+                    .antMatchers("/role/**").authenticated()
                     .antMatchers("/secure/**").authenticated();
 
         }

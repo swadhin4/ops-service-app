@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.ops.jpa.entities.AppFeature;
 import com.ops.jpa.entities.RolePermission;
+import com.ops.jpa.entities.RoleStatus;
 import com.ops.jpa.entities.UserRole;
 import com.ops.jpa.repository.RolePermissionRepo;
 import com.ops.web.service.RolePermissionService;
@@ -37,6 +38,34 @@ public class RolePermissionServiceImpl implements RolePermissionService {
 			}
 		}
 		return appAccessList;
+	}
+
+	@Override
+	public List<RoleStatus> getRoleStatus(final UserRole usr) {
+		try {
+			System.out.println("Role ID --- > "+usr.getRole().getRoleId());
+			List<RoleStatus> roleStatus = rolePermissionRepo.getRoleStatus(usr.getRole().getRoleId());
+			return roleStatus;
+		} catch (Exception e) {
+			LOGGER.error("Error Occured while fetching Role Status mapping");
+			e.printStackTrace();
+			return null;
+		}
+
+	}
+	
+	@Override
+	public List<RoleStatus> getRoleStatusByRoleId(final Long roleId) {
+		try {
+			System.out.println("Role ID --- > "+roleId);
+			List<RoleStatus> roleStatus = rolePermissionRepo.getRoleStatus(roleId);
+			return roleStatus;
+		} catch (Exception e) {
+			LOGGER.error("Error Occured while fetching Role Status mapping");
+			e.printStackTrace();
+			return null;
+		}
+
 	}
 
 }
